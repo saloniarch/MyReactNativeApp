@@ -1,14 +1,23 @@
-// screens/HomeScreen.js
-import React from 'react';
-import { SafeAreaView, StyleSheet, Text } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, SafeAreaView, StyleSheet, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 const HomeScreen = () => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000, // Duration of the fade-in
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
+
   return (
-    <SafeAreaView style={styles.container}>
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <Text style={styles.homeText}>Welcome to the Home Screen!</Text>
       <StatusBar style="auto" />
-    </SafeAreaView>
+    </Animated.View>
   );
 };
 
