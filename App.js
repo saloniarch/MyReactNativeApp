@@ -1,49 +1,30 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack'; 
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SplashScreen from './screens/SplashScreen';
 import HomeScreen from './screens/HomeScreen';
-import ProfileScreen from './screens/ProfileScreen'; // Import ProfileScreen
+import ProfileScreen from './screens/ProfileScreen';
 
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
-// Custom fade transition for both platforms
-const screenTransition = ({ current }) => {
-  const opacity = current.progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1], // Fade in from 0 to 1
-  });
+const TabNavigator = () => (
+  <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Screen name="Home" component={HomeScreen} />
+    <Tab.Screen name="Profile" component={ProfileScreen} />
+  </Tab.Navigator>
+);
 
-  return {
-    cardStyle: {
-      opacity, // Apply the fade animation
-    },
-  };
-};
-
-export default function App() {
+const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator 
-        initialRouteName="Splash" 
-        screenOptions={{ 
-          headerShown: false, 
-          cardStyleInterpolator: screenTransition // Custom fade transition
-        }}
-      >
-        <Stack.Screen 
-          name="Splash" 
-          component={SplashScreen} 
-        />
-        <Stack.Screen 
-          name="Home" 
-          component={HomeScreen} 
-        />
-        <Stack.Screen 
-          name="Profile" // Add Profile screen
-          component={ProfileScreen} 
-        />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="Main" component={TabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
+
+export default App;
