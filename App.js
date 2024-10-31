@@ -1,9 +1,9 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack'; // Change here
+import { createStackNavigator } from '@react-navigation/stack'; 
 import SplashScreen from './screens/SplashScreen';
 import HomeScreen from './screens/HomeScreen';
-import { Animated } from 'react-native';
+import ProfileScreen from './screens/ProfileScreen'; // Import ProfileScreen
 
 const Stack = createStackNavigator();
 
@@ -38,6 +38,10 @@ export default function App() {
         <Stack.Screen 
           name="Home" 
           component={HomeScreen} 
+        />
+        <Stack.Screen 
+          name="Profile" // Add Profile screen
+          component={ProfileScreen} 
         />
       </Stack.Navigator>
     </NavigationContainer>

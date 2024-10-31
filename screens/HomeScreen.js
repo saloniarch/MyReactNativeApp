@@ -1,22 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Animated, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const HomeScreen = ({ navigation }) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 1000, // Duration of the fade-in
-      useNativeDriver: true,
-    }).start();
-  }, [fadeAnim]);
-
   return (
     <SafeAreaView style={styles.container}>
-      <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+      <View style={styles.content}>
         <Text style={styles.homeText}>Welcome to the Home Screen!</Text>
-      </Animated.View>
+      </View>
 
       {/* Custom Bottom Navigation Bar */}
       <View style={styles.bottomBar}>
