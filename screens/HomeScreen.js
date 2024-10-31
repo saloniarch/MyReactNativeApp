@@ -55,14 +55,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingVertical: 10,
-    backgroundColor: '#fff',
+    paddingVertical: 20, // Increase vertical padding for height
+    backgroundColor: '#bcd6d3',
     borderTopWidth: 1,
     borderColor: '#ccc',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 70, // Set a fixed height for the bottom bar
+    elevation: 5, // Shadow effect for better visibility
   },
   bottomText: {
     fontSize: 16,
-    color: '#1DB954', // Spotify green for active look
+    color: '#007A7A', // Spotify green for active look
   },
 });
 
