@@ -1,3 +1,4 @@
+// screens/ProfileScreen.js
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
@@ -17,34 +18,24 @@ const ProfileScreen = ({ navigation }) => {
       <Text style={styles.userEmail}>john.doe@example.com</Text>
 
       {/* Edit Profile Button */}
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={() => navigation.navigate('EditProfile')} // Correct usage of navigate
-      >
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('EditProfile')}>
         <Text style={styles.buttonText}>Edit Profile</Text>
       </TouchableOpacity>
 
       {/* Settings Button */}
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={() => navigation.navigate('Settings')} // Correct usage of navigate
-      >
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Settings')}>
         <Text style={styles.buttonText}>Settings</Text>
       </TouchableOpacity>
-      
+
       {/* Logout Button */}
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={() => {
-          // Handle Logout
-        }}
-      >
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Logout')}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
+// Define your styles here
 const styles = StyleSheet.create({
   container: {
     flex: 1,

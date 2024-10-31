@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const EditProfileScreen = () => {
+const SettingsScreen = () => {
   return (
     <View style={styles.container}>
-      <Text>Edit Profile Screen</Text>
+      <Text>Settings Screen</Text>
     </View>
   );
 };
@@ -17,4 +17,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditProfileScreen;
+export default SettingsScreen;

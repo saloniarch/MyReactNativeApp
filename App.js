@@ -1,18 +1,24 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/Ionicons'; // Import the icons
 
+import SplashScreen from './screens/SplashScreen';
 import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import ChatScreen from './screens/ChatScreen';
+import EditProfileScreen from './screens/EditProfileScreen'; // New screen
+import SettingsScreen from './screens/SettingsScreen'; // New screen
+import LogoutScreen from './screens/LogoutScreen'; // New screen
 
+const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
-      headerShown: false, // Hide header for all screens
+      headerShown: false,
       tabBarIcon: ({ focused, color, size }) => {
         let iconName;
 
@@ -24,19 +30,14 @@ const TabNavigator = () => (
           iconName = focused ? 'person' : 'person-outline';
         }
 
-        return <Icon name={iconName} size={20} color={color} />;
-      },
-      tabBarLabelStyle: {
-        fontSize: 12,
-        fontWeight: '500',
-        paddingBottom: 4,
+        return <Icon name={iconName} size={size} color={color} />;
       },
       tabBarActiveTintColor: '#1DB954',
       tabBarInactiveTintColor: 'gray',
       tabBarStyle: {
-        height: 80,
-        paddingBottom: 10,
-        paddingTop: 4,
+        height: 70,
+        paddingTop: 10,
+        paddingBottom: 8,
         backgroundColor: '#d8e8e5',
       },
     })}
@@ -47,10 +48,18 @@ const TabNavigator = () => (
   </Tab.Navigator>
 );
 
-export default function App() {
+const App = () => {
   return (
     <NavigationContainer>
-      <TabNavigator />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="Main" component={TabNavigator} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="Logout" component={LogoutScreen} />
+      </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
+
+export default App;
