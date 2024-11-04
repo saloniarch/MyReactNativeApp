@@ -1,22 +1,31 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import SplashScreen from '../screens/SplashScreen';
-import HomeScreen from '../screens/HomeScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import LoggedOutScreen from './LoggedOutScreen';
+import HomeScreen from './HomeScreen';
+import ProfileScreen from './ProfileScreen';
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
-const AppNavigator = () => {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Splash" component={SplashScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Profile" component={ProfileScreen} /> {/* Ensure Profile is here */}
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-};
+
+const AppNavigator = () => (
+  <Stack.Navigator>
+    <Stack.Screen 
+      name="LoggedOut" 
+      component={LoggedOutScreen} 
+      options={{ 
+        headerShown: false, // Hide header if you want a cleaner look
+        gestureEnabled: false // Disable the swipe gesture
+      }} 
+    />
+    <Stack.Screen 
+      name="Main" 
+      component={HomeScreen} 
+      options={{ headerShown: false }} 
+    />
+    <Stack.Screen 
+      name="Profile" 
+      component={ProfileScreen} 
+    />
+  </Stack.Navigator>
+);
 
 export default AppNavigator;
