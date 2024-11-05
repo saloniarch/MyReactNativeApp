@@ -1,6 +1,6 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import jwt_decode from 'jwt-decode';
+import jwt_decode from 'jwt-decode'; // For decoding JWT to check expiry
 
 const API_URL = "http://10.0.0.13:5000/api/auth";
 
@@ -33,7 +33,7 @@ export const register = async ({ name, surname, email, password }) => {
   // API call for registration
   try {
     const response = await axios.post(`${API_URL}/register`, { name, surname, email, password });
-    return response.data; // Return response from the backend (for ex. success message)
+    return response.data; // Return response from the backend (e.g., success message)
   } catch (error) {
     console.error("Registration error:", error);
     throw new Error(error.response?.data?.message || 'Registration failed');
@@ -49,11 +49,12 @@ export const loginUser = async (email, password) => {
   try {
     const response = await axios.post(`${API_URL}/login`, { email, password });
 
+    // Assuming the backend response contains user and token
     const { token, user } = response.data;
 
     // Decode the token to check its expiry time
     const decodedToken = jwt_decode(token);
-    const currentTime = Date.now() / 1000;
+    const currentTime = Date.now() / 1000; // Current time in seconds
     if (decodedToken.exp < currentTime) {
       throw new Error("Token has expired");
     }
@@ -61,7 +62,7 @@ export const loginUser = async (email, password) => {
     // Store the token in AsyncStorage
     await AsyncStorage.setItem('token', token);
 
-    // store the user data as well
+    // Optionally store the user data as well
     await AsyncStorage.setItem('user', JSON.stringify(user));
 
     return { token, user }; // Return the token and user info
@@ -78,7 +79,7 @@ export const isTokenValid = async () => {
     if (!token) return false; // No token, not authenticated
 
     const decodedToken = jwt_decode(token);
-    const currentTime = Date.now() / 1000;
+    const currentTime = Date.now() / 1000; // Current time in seconds
     return decodedToken.exp > currentTime; // Check if the token has expired
   } catch (error) {
     console.error("Error checking token validity:", error);

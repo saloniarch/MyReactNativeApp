@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   // Check if the user is authenticated on app start
   useEffect(() => {
     const checkAuth = async () => {
-      const token = await Keychain.getGenericPassword(); // Fetch token from storage
+      const token = await Keychain.getGenericPassword(); // Fetch token from secure storage
       if (token && token.password) {
         const decodedToken = jwt_decode(token.password); // Decode the token to get its expiry time
 
@@ -34,10 +34,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const { token, user } = await loginUser(username, password); // Call login API function
+      const { token, user } = await loginUser(username, password); // Call your login API function
 
-      // Store the token
-      await Keychain.setGenericPassword('auth_token', token); // Store the JWT token
+      // Store the token securely
+      await Keychain.setGenericPassword('auth_token', token); // Store the JWT token securely
 
       setIsAuthenticated(true);
       setUser(user);
@@ -52,13 +52,14 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setIsAuthenticated(false);
     setUser(null);
-    await Keychain.resetGenericPassword(); // Clear token from  storage
+    await Keychain.resetGenericPassword(); // Clear the token from secure storage
   };
 
-  // Fetch user data from token
+  // Fetch user data from token (optional)
   const fetchUserFromToken = async (token) => {
     try {
-      // use token to make an API call to fetch user info
+      // You can use the token to make an API call to fetch user info if needed
+      // Example:
       const response = await fetch('http://localhost:5000/api/auth/user', {
         method: 'GET',
         headers: {
