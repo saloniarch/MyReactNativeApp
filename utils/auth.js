@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http:// 10.0.0.13/api/auth"; // Update this URL if needed for production
+const API_URL = "http://10.0.0.13:5000/api/auth"; // Update this URL if needed for production
 
 export const isValidEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,7 +25,7 @@ export const register = async ({ name, surname, email, password }) => {
     );
   }
 
-  // Here, you would implement the actual registration logic, e.g., an API call
+  // Here implement the  registration logic, e.g., an API call
   return { success: true }; // Placeholder for success response
 };
 
