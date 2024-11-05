@@ -1,8 +1,8 @@
-const express = require("express");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-const authMiddleware = require("../middleware/authMiddleware"); // Ensures protected route access
+import express from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -62,4 +62,4 @@ router.get("/protected", authMiddleware, (req, res) => {
   res.json({ message: "Protected content", user: req.user });
 });
 
-module.exports = router;
+export default router;  // This is needed if you use ES Modules (check if your environment uses it)
