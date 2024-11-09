@@ -12,7 +12,6 @@ const SplashScreen = ({ navigation }) => {
       duration: 2000, // Duration of the fade-in
       useNativeDriver: true,
     }).start(() => {
-      // After fade-in, wait for a moment and then fade out
       setTimeout(() => {
         Animated.timing(fadeAnim, {
           toValue: 0, // Fade out to fully invisible

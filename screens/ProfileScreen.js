@@ -1,4 +1,3 @@
-// screens/ProfileScreen.js
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
@@ -35,13 +34,12 @@ const ProfileScreen = ({ navigation }) => {
   );
 };
 
-// Define your styles here
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#e5f1ef', // Same background as the app
+    backgroundColor: '#e5f1ef',
     padding: 20,
   },
   profilePictureContainer: {

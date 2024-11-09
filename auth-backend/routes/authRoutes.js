@@ -10,7 +10,6 @@ const router = express.Router();
 router.post("/register", async (req, res) => {
   const { name, surname, email, password } = req.body;
 
-  // Basic validation
   if (!name || !surname || !email || !password) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -20,7 +19,7 @@ router.post("/register", async (req, res) => {
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: "Email already registered" });
 
-    // Hash password for security
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ name, surname, email, password: hashedPassword });
     await newUser.save();
@@ -35,7 +34,6 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  // Basic validation
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password are required" });
   }
@@ -45,7 +43,7 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-    // Check password validity
+    // Validate password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) return res.status(400).json({ message: "Invalid credentials" });
 
@@ -57,9 +55,9 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Route: Protected Content (Example)
+// Route: Protected Content
 router.get("/protected", authMiddleware, (req, res) => {
   res.json({ message: "Protected content", user: req.user });
 });
 
-export default router;  // This is needed if you use ES Modules (check if your environment uses it)
+export default router;

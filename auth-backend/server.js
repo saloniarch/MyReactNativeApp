@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
-import authRoutes from "./routes/authRoutes.js"; // Import routes
+import authRoutes from "./routes/authRoutes.js";
 
 dotenv.config();
 
@@ -20,7 +20,7 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
   .then(() => console.log("Connected to MongoDB"))
   .catch(err => console.error("Could not connect to MongoDB:", err));
 
-// Use the imported authRoutes
+// Use the authRoutes
 app.use("/api/auth", authRoutes);
 
 app.listen(PORT, () => {

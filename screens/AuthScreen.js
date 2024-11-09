@@ -1,7 +1,7 @@
 import React, { useState } from 'react'; 
 import { View, Text, TextInput, Button, Alert, StyleSheet, TouchableOpacity } from 'react-native';
-import { register } from '../utils/auth'; // Use your updated auth functions
-import { useAuth } from '../contexts/AuthContext'; // Import your Auth context
+import { register } from '../utils/auth';
+import { useAuth } from '../contexts/AuthContext';
 
 const AuthScreen = ({ navigation }) => {
   const [isRegistering, setIsRegistering] = useState(true);
@@ -20,7 +20,7 @@ const AuthScreen = ({ navigation }) => {
       Alert.alert("Success", "Registration successful!");
       navigation.replace("Main"); // Redirect to the main screen after registration
     } catch (error) {
-      Alert.alert("Registration Error", error.message); // Show validation error
+      Alert.alert("Registration Error", error.message); // validation error
     }
   };
 
@@ -28,10 +28,10 @@ const AuthScreen = ({ navigation }) => {
     try {
       const userData = await login(email, password); // login function should return user info
       setUser(userData.user); // Store user data in context
-      navigation.replace('Main'); // Navigate to the main screen or wherever appropriate
+      navigation.replace('Main'); // Navigate to the main screen
     } catch (error) {
       console.error("Login error:", error.message);
-      Alert.alert("Login failed", error.message || "An error occurred during login."); // More informative alert
+      Alert.alert("Login failed", error.message || "An error occurred during login.");
     }
   };
 

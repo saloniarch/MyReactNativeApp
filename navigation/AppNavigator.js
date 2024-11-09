@@ -12,7 +12,7 @@ const AppNavigator = () => (
       name="LoggedOut" 
       component={LoggedOutScreen} 
       options={{ 
-        headerShown: false, // Hide header if you want a cleaner look
+        headerShown: false, // Hide header
         gestureEnabled: false // Disable the swipe gesture
       }} 
     />

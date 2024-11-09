@@ -15,11 +15,11 @@ const Message = ({ text, timestamp, imageUri }) => {
     PanResponder.create({
       onMoveShouldSetPanResponder: (evt, gestureState) => {
         const { dx } = gestureState;
-        return Math.abs(dx) > 30; // Threshold for swipe
+        return Math.abs(dx) > 30; // Threshold for swiping messages to see the time these were sent
       },
       onPanResponderGrant: () => {
         Animated.spring(translateX, {
-          toValue: -100, // Adjust this value for the swipe distance
+          toValue: -100, // value for the swipe distance
           useNativeDriver: true,
         }).start(() => setSwiped(true));
       },
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   attachButton: {
-    padding: 5, // Adjust padding for a subtle look
+    padding: 5,
   },
   attachButtonText: {
     fontSize: 15,
