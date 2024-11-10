@@ -1,8 +1,9 @@
 import axios from 'axios';
+import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from 'jwt-decode'; // For decoding JWT to check expiry
 
-const API_URL = "http://10.0.0.13:5000/api/auth";
+const API_URL = __DEV__ ? "http://10.0.0.13:5000/api/auth" : "https://yourapi.com/api/auth"; // Dynamic API URL for dev and prod environments
 
 // Validate email format
 export const isValidEmail = (email) => {
@@ -49,7 +50,6 @@ export const loginUser = async (email, password) => {
   try {
     const response = await axios.post(`${API_URL}/login`, { email, password });
 
-    // Assuming the backend response contains user and token
     const { token, user } = response.data;
 
     // Decode the token to check its expiry time
@@ -59,11 +59,9 @@ export const loginUser = async (email, password) => {
       throw new Error("Token has expired");
     }
 
-    // Store the token in AsyncStorage
-    await AsyncStorage.setItem('token', token);
-
-    // Optionally store the user data as well
-    await AsyncStorage.setItem('user', JSON.stringify(user));
+    // Store the token securely using Keychain
+    await Keychain.setGenericPassword('auth_token', token);
+    await Keychain.setGenericPassword('user_data', JSON.stringify(user));
 
     return { token, user }; // Return the token and user info
   } catch (error) {
@@ -72,12 +70,13 @@ export const loginUser = async (email, password) => {
   }
 };
 
-// Check if token is valid
+// Check if token is valid (to be used on app load or before requests)
 export const isTokenValid = async () => {
   try {
-    const token = await AsyncStorage.getItem('token');
-    if (!token) return false; // No token, not authenticated
+    const credentials = await Keychain.getGenericPassword();
+    if (!credentials) return false; // No token, not authenticated
 
+    const token = credentials.password;
     const decodedToken = jwt_decode(token);
     const currentTime = Date.now() / 1000; // Current time in seconds
     return decodedToken.exp > currentTime; // Check if the token has expired
@@ -87,8 +86,48 @@ export const isTokenValid = async () => {
   }
 };
 
+// Fetch user data from token (optional)
+export const fetchUserFromToken = async (token) => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/auth/user', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data; // Return user data
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw new Error('Unable to fetch user data');
+  }
+};
+
 // Logout function
 export const logout = async () => {
-  await AsyncStorage.removeItem('token');
-  await AsyncStorage.removeItem('user');
+  await Keychain.resetGenericPassword(); // Clear the token from secure storage
+  await Keychain.resetGenericPassword(); // Clear the user data from secure storage
 };
+
+// Axios Interceptor for attaching token to all requests
+axios.interceptors.request.use(
+  async (config) => {
+    const credentials = await Keychain.getGenericPassword();
+    if (credentials && credentials.password) {
+      config.headers['Authorization'] = `Bearer ${credentials.password}`; // Attach token if available
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Axios Interceptor to handle token expiration (401 Unauthorized response)
+axios.interceptors.response.use(
+  (response) => response, // Proceed with the response if valid
+  async (error) => {
+    if (error.response.status === 401) {
+      // Handle token expiration or unauthorized access here
+      await Keychain.resetGenericPassword(); // Clear expired token
+      // Optionally navigate to login screen or show an alert
+    }
+    return Promise.reject(error); // Reject the error if it is not handled
+  }
+);

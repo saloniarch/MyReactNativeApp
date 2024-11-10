@@ -26,14 +26,14 @@ const AuthScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const userData = await login(email, password); // login function should return user info
-      setUser(userData.user); // Store user data in context
-      navigation.replace('Main'); // Navigate to the main screen
+      const userData = await login(email, password);
+      setUser(userData.user);
+      navigation.replace('Main');
     } catch (error) {
-      console.error("Login error:", error.message);
       Alert.alert("Login failed", error.message || "An error occurred during login.");
     }
   };
+  
 
   return (
     <View style={styles.container}>
