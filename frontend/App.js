@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SplashScreen from './src/screens/SplashScreen'; // Corrected import
 import HomeScreen from './src/screens/HomeScreen';
+import EventScreen from './src/screens/EventScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
@@ -30,6 +31,8 @@ const TabNavigator = () => (
           iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
         } else if (route.name === 'Profile') {
           iconName = focused ? 'person' : 'person-outline';
+        } else if (route.name === 'Event'){
+          iconName = focused ? 'add-circle' : 'add-circle-outline';
         }
 
         return <Icon name={iconName} size={size} color={color} />;
@@ -45,6 +48,7 @@ const TabNavigator = () => (
     })}
   >
     <Tab.Screen name="Home" component={HomeScreen} />
+    <Tab.Screen name="Event" component={EventScreen} />
     <Tab.Screen name="Chat" component={ChatScreen} />
     <Tab.Screen name="Profile" component={ProfileScreen} />
   </Tab.Navigator>
