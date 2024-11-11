@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Image, SafeAreaView, StyleSheet } from 'react-native';
+import { Animated, SafeAreaView, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import colors from '../styles/colors';
 
 const SplashScreen = ({ navigation }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Start fade in effect
+    // Start fade-in effect
     Animated.timing(fadeAnim, {
       toValue: 1, // Fade in to fully visible
       duration: 2000, // Duration of the fade-in
@@ -15,7 +16,7 @@ const SplashScreen = ({ navigation }) => {
       setTimeout(() => {
         Animated.timing(fadeAnim, {
           toValue: 0, // Fade out to fully invisible
-          duration: 1000, // Duration of the fade-out
+          duration: 1500, // Duration of the fade-out
           useNativeDriver: true,
         }).start(() => {
           // Navigate to the main app once the fade-out is complete
@@ -28,7 +29,7 @@ const SplashScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <Animated.Image
-        source={require('../assets/icon.png')}
+        source={require('../../assets/icon.png')}
         style={[styles.logo, { opacity: fadeAnim }]} // Animate opacity
       />
       <StatusBar style="auto" />
@@ -39,7 +40,7 @@ const SplashScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e5f1ef',
+    backgroundColor: colors.darkGray, // Use the dark gray from colors.js
     alignItems: 'center',
     justifyContent: 'center',
   },
