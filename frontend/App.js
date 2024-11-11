@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
-import SplashScreen from './src/screens/SplashScreen';
+import SplashScreen from './src/screens/SplashScreen'; // Corrected import
 import HomeScreen from './src/screens/HomeScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import ChatScreen from './src/screens/ChatScreen';
@@ -16,6 +16,7 @@ import { UserProvider } from './src/contexts/UserContext';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// Tab navigator for main app screens
 const TabNavigator = () => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
