@@ -46,12 +46,15 @@ const AuthScreen = ({ navigation }) => {
             placeholder="Name"
             value={name}
             onChangeText={setName}
+            placeholderTextColor="#FFFFFF"
+
           />
           <TextInput
             style={styles.input}
             placeholder="Surname"
             value={surname}
             onChangeText={setSurname}
+            placeholderTextColor="#FFFFFF"
           />
         </>
       )}
@@ -63,6 +66,7 @@ const AuthScreen = ({ navigation }) => {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        placeholderTextColor="#FFFFFF"
       />
       <TextInput
         style={styles.input}
@@ -71,6 +75,7 @@ const AuthScreen = ({ navigation }) => {
         onChangeText={setPassword}
         secureTextEntry
         autoCapitalize="none"
+        placeholderTextColor="#FFFFFF"
       />
 
       <Button
@@ -92,24 +97,27 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#e5f1ef',
+    backgroundColor: '#000000',
   },
   title: {
     fontSize: 24,
     marginBottom: 20,
+    color: '#8ACE00'
   },
   input: {
     width: '80%',
-    padding: 10,
+    paddingVertical: 8,  // Use paddingVertical instead of general padding for consistency
+    paddingHorizontal: 10,
     marginVertical: 10,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
-    backgroundColor: '#fff',
+    borderRadius: 20,
+    backgroundColor: '#444',
+    color: '#FFFFFF'
   },
   toggleText: {
     marginTop: 20,
-    color: '#1DB954',
+    color: '#8ACE00',
     textDecorationLine: 'underline',
   },
 });

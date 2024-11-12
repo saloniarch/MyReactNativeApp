@@ -1,15 +1,32 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Modal, TextInput, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../styles/globalStyles';
+import colors from '../styles/colors';
 
-const EditProfileScreen = () => {
+const EditProfileScreen = ({ navigation }) => {
   const [profileImage, setProfileImage] = useState(null);
-  const [name, setName] = useState('John Doe');
-  const [email, setEmail] = useState('john.doe@example.com');
-  const [bio, setBio] = useState('This is my bio');
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [editableField, setEditableField] = useState(null);
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [bio, setBio] = useState('');
+
+  // Load data from AsyncStorage on mount
+  useEffect(() => {
+    const loadProfileData = async () => {
+      const savedProfile = await AsyncStorage.getItem('profileData');
+      if (savedProfile) {
+        const {name, username, email, bio, profileImage } = JSON.parse(savedProfile);
+        setName(name || 'John Doe');
+        setUsername(username || 'New Username');
+        setEmail(email || 'john.doe@example.com');
+        setBio(bio || 'This is my bio');
+        setProfileImage(profileImage || null);
+      }
+    };
+    loadProfileData();
+  }, []);
 
   // Handle profile image selection
   const selectProfileImage = async () => {
@@ -25,33 +42,25 @@ const EditProfileScreen = () => {
     }
   };
 
-  // Toggle the modal visibility and set the editable field
-  const openEditModal = (field) => {
-    setEditableField(field);
-    setModalVisible(true);
-  };
-
-  // Save changes to the profile
-  const saveChanges = () => {
-    console.log('Profile updated:', { name, email, bio, profileImage });
-    setModalVisible(false);
-  };
-
-  // Handle changes in input field for modal
-  const handleInputChange = (text) => {
-    if (editableField === 'name') {
-      setName(text);
-    } else if (editableField === 'email') {
-      setEmail(text);
-    } else if (editableField === 'bio') {
-      setBio(text);
-    }
+  // After saving the profile changes, navigate to Profile tab within Main
+  const saveChangesAndNavigate = () => {
+    // Save changes here, then navigate
+    navigation.navigate("Main", {
+      screen: "Profile", // This tells Main to go directly to the Profile tab
+      params: {
+        name: name,             // Pass the updated name
+        username: username,     // Pass the updated username
+        email: email,          // Pass the updated email
+        bio: bio,              // Pass the updated bio
+        profileImage: profileImage, // Pass the updated profile image URI
+      },
+  });
   };
 
   return (
     <View style={[globalStyles.container, styles.container]}>
       {/* Profile Image */}
-      <TouchableOpacity onPress={selectProfileImage}>
+      <TouchableOpacity onPress={selectProfileImage} style={styles.imageContainer}>
         {profileImage ? (
           <Image source={{ uri: profileImage }} style={styles.profileImage} />
         ) : (
@@ -61,148 +70,110 @@ const EditProfileScreen = () => {
         )}
       </TouchableOpacity>
 
-      {/* Name */}
+      {/* Name Field */}
       <View style={styles.fieldContainer}>
-        <Text style={styles.fieldLabel}>Name:</Text>
-        <Text style={styles.fieldValue} onPress={() => openEditModal('name')}>{name}</Text>
+        <Text style={styles.fieldLabel}>Name</Text>
+        <TextInput
+          style={styles.fieldInput}
+          value={name}
+          onChangeText={setName}
+          placeholder="Enter name"
+        />
       </View>
 
-      {/* Email */}
+      {/* Username Field */}
       <View style={styles.fieldContainer}>
-        <Text style={styles.fieldLabel}>Email:</Text>
-        <Text style={styles.fieldValue} onPress={() => openEditModal('email')}>{email}</Text>
+        <Text style={styles.fieldLabel}>Username</Text>
+        <TextInput
+          style={styles.fieldInput}
+          value={username}
+          onChangeText={setUsername}
+          placeholder="Enter username"
+        />
       </View>
 
-      {/* Bio */}
+      {/* Email Field */}
       <View style={styles.fieldContainer}>
-        <Text style={styles.fieldLabel}>Bio:</Text>
-        <Text style={styles.fieldValue} onPress={() => openEditModal('bio')}>{bio}</Text>
+        <Text style={styles.fieldLabel}>Email</Text>
+        <TextInput
+          style={styles.fieldInput}
+          value={email}
+          onChangeText={setEmail}
+          placeholder="Enter email"
+        />
       </View>
 
-      {/* Save and Cancel Buttons */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={[globalStyles.button, styles.button]} onPress={saveChanges}>
-          <Text style={globalStyles.buttonText}>Save Changes</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[globalStyles.button, styles.button, styles.cancelButton]} onPress={() => setModalVisible(false)}>
-          <Text style={globalStyles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
+      {/* Bio Field */}
+      <View style={styles.fieldContainer}>
+        <Text style={styles.fieldLabel}>Bio</Text>
+        <TextInput
+          style={styles.fieldInput}
+          value={bio}
+          onChangeText={setBio}
+          placeholder="Enter bio"
+          multiline
+        />
       </View>
 
-      {/* Edit Modal */}
-      <Modal
-        visible={isModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TextInput
-              style={styles.input}
-              value={editableField === 'name' ? name : editableField === 'email' ? email : bio}
-              onChangeText={handleInputChange}
-              placeholder={`Enter your ${editableField}`}
-            />
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.modalButton} onPress={saveChanges}>
-                <Text style={globalStyles.buttonText}>Save</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
-                <Text style={globalStyles.buttonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {/* Save Changes Button */}
+      <TouchableOpacity style={[globalStyles.button, styles.saveButton]} onPress={saveChangesAndNavigate}>
+        <Text style={globalStyles.buttonText}>Save Changes</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 50,
+    paddingTop: 30,
     paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+  imageContainer: {
+    alignItems: 'center',
     marginBottom: 20,
   },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
   profileImagePlaceholder: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     backgroundColor: '#ccc',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
   },
   addPhotoText: {
-    color: '#fff',
+    color: colors.white,
   },
   fieldContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
+    marginVertical: 10,
     width: '100%',
-    marginBottom: 20,
   },
   fieldLabel: {
+    color: colors.primary, // Apply primary color to labels
     fontWeight: 'bold',
-    color: '#333',
-  },
-  fieldValue: {
-    color: '#007BFF',
-    fontSize: 16,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 20,
-  },
-  button: {
     flex: 1,
-    marginHorizontal: 5,
-    borderRadius: 5,
-    paddingVertical: 12,
   },
-  cancelButton: {
-    backgroundColor: '#FF3B30',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: '80%',
-    padding: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-  },
-  input: {
-    width: '100%',
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
+  fieldInput: {
+    flex: 2,
+    borderBottomWidth: 1,
+    backgroundColor: '#444',
+    borderRadius: 20,
+    paddingVertical: 5,
     paddingHorizontal: 10,
-    marginBottom: 20,
+    color: colors.white,
   },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  modalButton: {
-    flex: 1,
-    marginHorizontal: 5,
-    paddingVertical: 12,
-    backgroundColor: '#1DB954',
+  saveButton: {
+    marginTop: 30,
     borderRadius: 5,
-    alignItems: 'center',
   },
 });
 

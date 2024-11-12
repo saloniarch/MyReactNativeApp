@@ -117,4 +117,9 @@ export const globalStyles = StyleSheet.create({
     width: '95%',
     alignSelf: 'center',
   },
+    toggleText: {
+    marginTop: 20,
+    color: '#1DB954',
+    textDecorationLine: 'underline',
+  },
 });

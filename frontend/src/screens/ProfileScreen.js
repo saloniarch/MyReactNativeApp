@@ -4,20 +4,21 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { globalStyles } from '../styles/globalStyles';
 
-const ProfileScreen = ({ navigation }) => {
+const ProfileScreen = ({ route, navigation }) => {
+  const {name, username, email, bio, profileImage } = route.params || {};
+
   return (
     <View style={[globalStyles.container, styles.container]}>
-      {/* Profile Picture */}
       <View style={styles.profilePictureContainer}>
         <Image
-          source={{ uri: 'https://via.placeholder.com/100' }} // Placeholder image URL
+          source={{ uri: profileImage || 'https://via.placeholder.com/100' }} // Use profileImage or fallback
           style={styles.profilePicture}
         />
       </View>
 
       {/* User Information */}
-      <Text style={[globalStyles.text, styles.userName]}>John Doe</Text>
-      <Text style={[globalStyles.text, styles.userEmail]}>john.doe@example.com</Text>
+      <Text style={[globalStyles.text, styles.userName]}>{name || 'John Doe'}</Text>
+      <Text style={[globalStyles.text, styles.userEmail]}>{email || 'john.doe@example.com'}</Text>
 
       {/* Edit Profile Button */}
       <TouchableOpacity style={[globalStyles.button, styles.button]} onPress={() => navigation.navigate('EditProfile')}>
