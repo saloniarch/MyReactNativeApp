@@ -1,9 +1,12 @@
+// src/screens/ProfileScreen.js
+
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { globalStyles } from '../styles/globalStyles';
 
 const ProfileScreen = ({ navigation }) => {
   return (
-    <View style={styles.container}>
+    <View style={[globalStyles.container, styles.container]}>
       {/* Profile Picture */}
       <View style={styles.profilePictureContainer}>
         <Image
@@ -13,22 +16,22 @@ const ProfileScreen = ({ navigation }) => {
       </View>
 
       {/* User Information */}
-      <Text style={styles.userName}>John Doe</Text>
-      <Text style={styles.userEmail}>john.doe@example.com</Text>
+      <Text style={[globalStyles.text, styles.userName]}>John Doe</Text>
+      <Text style={[globalStyles.text, styles.userEmail]}>john.doe@example.com</Text>
 
       {/* Edit Profile Button */}
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('EditProfile')}>
-        <Text style={styles.buttonText}>Edit Profile</Text>
+      <TouchableOpacity style={[globalStyles.button, styles.button]} onPress={() => navigation.navigate('EditProfile')}>
+        <Text style={globalStyles.buttonText}>Edit Profile</Text>
       </TouchableOpacity>
 
       {/* Settings Button */}
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Settings')}>
-        <Text style={styles.buttonText}>Settings</Text>
+      <TouchableOpacity style={[globalStyles.button, styles.button]} onPress={() => navigation.navigate('Settings')}>
+        <Text style={globalStyles.buttonText}>Settings</Text>
       </TouchableOpacity>
 
       {/* Logout Button */}
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Logout')}>
-        <Text style={styles.buttonText}>Logout</Text>
+      <TouchableOpacity style={[globalStyles.button, styles.button]} onPress={() => navigation.navigate('Logout')}>
+        <Text style={globalStyles.buttonText}>Logout</Text>
       </TouchableOpacity>
     </View>
   );
@@ -36,10 +39,8 @@ const ProfileScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#e5f1ef',
     padding: 20,
   },
   profilePictureContainer: {
@@ -59,24 +60,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#000',
   },
   userEmail: {
     fontSize: 16,
-    color: '#555',
     marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#1DB954',
-    borderRadius: 5,
-    padding: 10,
-    width: '80%',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
   },
 });
 

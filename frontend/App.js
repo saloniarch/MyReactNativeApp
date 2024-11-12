@@ -37,13 +37,13 @@ const TabNavigator = () => (
 
         return <Icon name={iconName} size={size} color={color} />;
       },
-      tabBarActiveTintColor: '#1DB954',
-      tabBarInactiveTintColor: 'gray',
+      tabBarActiveTintColor: '#8ACE00', // Green color for active icons
+      tabBarInactiveTintColor: 'gray',   // Gray for inactive icons
       tabBarStyle: {
         height: 70,
         paddingTop: 10,
         paddingBottom: 8,
-        backgroundColor: '#d8e8e5',
+        backgroundColor: '#000000', // Black background for tab bar
       },
     })}
   >
@@ -53,6 +53,7 @@ const TabNavigator = () => (
     <Tab.Screen name="Profile" component={ProfileScreen} />
   </Tab.Navigator>
 );
+
 
 const App = () => {
   return (

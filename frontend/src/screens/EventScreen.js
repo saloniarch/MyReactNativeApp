@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { globalStyles } from '../styles/globalStyles';
 
 const EventScreen = () => {
   return (
-    <View>
-      <Text>Event Screen</Text>
+    <View style={globalStyles.container}>
+      <Text style={globalStyles.title}>Events Screen</Text>
     </View>
   );
 };

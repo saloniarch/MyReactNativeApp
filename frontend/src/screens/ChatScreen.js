@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Animated, PanResponder, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, Animated, PanResponder, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { launchImageLibrary } from 'react-native-image-picker';
+import { globalStyles } from '../styles/globalStyles'; // Import global styles
 
 const formatTime = (date) => {
   return `${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`;
 };
 
-const Message = ({ text, timestamp, imageUri }) => {
+const Message = ({ text, timestamp, imageUri, fromCurrentUser }) => {
   const [swiped, setSwiped] = useState(false);
   const translateX = useRef(new Animated.Value(0)).current;
 
@@ -15,11 +16,11 @@ const Message = ({ text, timestamp, imageUri }) => {
     PanResponder.create({
       onMoveShouldSetPanResponder: (evt, gestureState) => {
         const { dx } = gestureState;
-        return Math.abs(dx) > 30; // Threshold for swiping messages to see the time these were sent
+        return Math.abs(dx) > 30;
       },
       onPanResponderGrant: () => {
         Animated.spring(translateX, {
-          toValue: -100, // value for the swipe distance
+          toValue: -100,
           useNativeDriver: true,
         }).start(() => setSwiped(true));
       },
@@ -32,16 +33,21 @@ const Message = ({ text, timestamp, imageUri }) => {
     })
   ).current;
 
+  // Dynamic styling based on sender
+  const messageBubbleStyle = fromCurrentUser
+    ? [globalStyles.messageBubble, globalStyles.currentUserBubble]
+    : [globalStyles.messageBubble, globalStyles.otherUserBubble];
+
   return (
     <Animated.View 
       {...panResponder.panHandlers} 
-      style={[styles.messageContainer, { transform: [{ translateX }] }]}
+      style={[globalStyles.messageContainer, { transform: [{ translateX }] }]}
     >
-      <View style={styles.messageBubble}>
-        <Text style={styles.messageText}>{text}</Text>
-        {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
+      <View style={messageBubbleStyle}>
+        <Text style={globalStyles.messageText}>{text}</Text>
+        {imageUri && <Image source={{ uri: imageUri }} style={globalStyles.image} />}
       </View>
-      {swiped && <Text style={styles.timestamp}>{timestamp}</Text>}
+      {swiped && <Text style={globalStyles.timestamp}>{timestamp}</Text>}
     </Animated.View>
   );
 }
@@ -76,140 +82,78 @@ const ChatScreen = () => {
         id: Date.now().toString(),
         text: text.trim(),
         timestamp: formatTime(new Date()),
-        imageUri: selectedImage || null, // Include the image URI if one is selected
+        imageUri: selectedImage || null, 
+        userId: 1, // Assuming userId 1 is the current user
       };
       const updatedMessages = [...messages, newMessage];
       setMessages(updatedMessages);
       setText('');
-      setSelectedImage(null); // Reset the selected image after sending
+      setSelectedImage(null);
       flatListRef.current.scrollToEnd({ animated: true });
-      saveMessages(updatedMessages); // Save messages whenever they change
+      saveMessages(updatedMessages);
     }
   };
 
-  const [selectedImage, setSelectedImage] = useState(null); // State for selected image
+  const [selectedImage, setSelectedImage] = useState(null); 
 
   const pickImage = () => {
     launchImageLibrary(
       { mediaType: 'photo', quality: 1 },
       (response) => {
         if (!response.didCancel && !response.error && response.assets) {
-          setSelectedImage(response.assets[0].uri); // Set the selected image URI
+          setSelectedImage(response.assets[0].uri);
         }
       }
     );
   };
 
   useEffect(() => {
-    loadMessages(); // Load messages when component mounts
+    loadMessages();
   }, []);
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={globalStyles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={10}
     >
       <FlatList
         ref={flatListRef}
         data={messages}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <Message text={item.text} timestamp={item.timestamp} imageUri={item.imageUri} />
+          <Message 
+            text={item.text} 
+            timestamp={item.timestamp} 
+            imageUri={item.imageUri} 
+            fromCurrentUser={item.userId === 1} // Dynamically determine if from current user
+          />
         )}
-        contentContainerStyle={styles.messagesContainer}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'flex-end', 
+          paddingBottom: 15, 
+        }}
         onContentSizeChange={() => flatListRef.current.scrollToEnd({ animated: true })}
       />
 
-      <View style={styles.inputContainer}>
-        <TouchableOpacity onPress={pickImage} style={styles.attachButton}>
-          <Text style={styles.attachButtonText}>📎</Text>
+      <View style={globalStyles.inputContainer}>
+        <TouchableOpacity onPress={pickImage} style={globalStyles.attachButton}>
+          <Text style={globalStyles.attachButtonText}>📎</Text>
         </TouchableOpacity>
         <TextInput
-          style={styles.input}
+          style={globalStyles.input}
           placeholder="Type a message"
           value={text}
           onChangeText={setText}
           onSubmitEditing={sendMessage}
         />
-        <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
-          <Text style={styles.sendButtonText}>Send</Text>
+        <TouchableOpacity onPress={sendMessage} style={globalStyles.sendButton}>
+          <Text style={globalStyles.sendButtonText}>Send</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#e5f1ef',
-  },
-  messagesContainer: {
-    paddingHorizontal: 10,
-    paddingTop: 10,
-    flexGrow: 1,
-    justifyContent: 'flex-end',
-  },
-  messageContainer: {
-    flexDirection: 'row', // Keep the message and timestamp in a row
-    alignItems: 'center', // Center items vertically
-    justifyContent: 'flex-end', // Align items to the end (right)
-    marginVertical: 5, // Space between messages
-  },
-  messageBubble: {
-    backgroundColor: '#DCF8C6',
-    padding: 10,
-    borderRadius: 5,
-    maxWidth: '75%', // Less stretched message width
-    marginRight: 10, // Space between message bubble and timestamp
-    alignSelf: 'flex-end', // Align the message bubble to the right
-  },
-  messageText: {
-    fontSize: 16,
-    flex: 1, // Allow text to grow
-  },
-  image: {
-    width: 150, // Set width for images
-    height: 150, // Set height for images
-    borderRadius: 5,
-    marginTop: 5, // Space between text and image
-  },
-  timestamp: {
-    fontSize: 12,
-    color: '#555',
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderTopWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    paddingVertical: 8,
-  },
-  sendButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    backgroundColor: '#1DB954',
-    borderRadius: 5,
-    marginLeft: 5,
-  },
-  attachButton: {
-    padding: 5,
-  },
-  attachButtonText: {
-    fontSize: 15,
-  },
-  sendButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-});
 
 export default ChatScreen;

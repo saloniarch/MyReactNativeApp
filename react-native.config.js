@@ -1,4 +1,2 @@
-module.exports = {
-    assets: ['./assets/fonts'],
-  };
+export const assets = ['./assets/fonts'];
   
