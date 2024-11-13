@@ -1,11 +1,27 @@
-// src/screens/ProfileScreen.js
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { globalStyles } from '../styles/globalStyles';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const ProfileScreen = ({ route, navigation }) => {
-  const {name, username, email, bio, profileImage } = route.params || {};
+  const { name, username, email, bio, profileImage } = route.params || {};
+
+  useEffect(() => {
+    // Log to ensure useEffect runs
+    console.log('Setting header options for ProfileScreen');
+
+    // Setting header right icon for the profile screen
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={{ marginRight: 10 }} // Add some margin for positioning
+          onPress={() => navigation.navigate('Settings')}  // Navigate to Settings screen
+        >
+          <Icon name="settings-outline" size={30} color="#8ACE00" /> {/* Icon for Settings */}
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
 
   return (
     <View style={[globalStyles.container, styles.container]}>
@@ -23,11 +39,6 @@ const ProfileScreen = ({ route, navigation }) => {
       {/* Edit Profile Button */}
       <TouchableOpacity style={[globalStyles.button, styles.button]} onPress={() => navigation.navigate('EditProfile')}>
         <Text style={globalStyles.buttonText}>Edit Profile</Text>
-      </TouchableOpacity>
-
-      {/* Settings Button */}
-      <TouchableOpacity style={[globalStyles.button, styles.button]} onPress={() => navigation.navigate('Settings')}>
-        <Text style={globalStyles.buttonText}>Settings</Text>
       </TouchableOpacity>
 
       {/* Logout Button */}

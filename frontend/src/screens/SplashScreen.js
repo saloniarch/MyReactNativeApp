@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, SafeAreaView, StyleSheet } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import colors from '../styles/colors';
+import { StatusBar } from 'expo-status-bar'; 
+import colors from '../styles/colors';  // Assuming you have this for colors
 
 const SplashScreen = ({ navigation }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -10,19 +10,20 @@ const SplashScreen = ({ navigation }) => {
     // Start fade-in effect
     Animated.timing(fadeAnim, {
       toValue: 1, // Fade in to fully visible
-      duration: 2000, // Duration of the fade-in
+      duration: 2000, 
       useNativeDriver: true,
     }).start(() => {
       setTimeout(() => {
+        // After 1 second, fade-out and navigate to Main
         Animated.timing(fadeAnim, {
-          toValue: 0, // Fade out to fully invisible
-          duration: 1500, // Duration of the fade-out
+          toValue: 0, 
+          duration: 1500,
           useNativeDriver: true,
         }).start(() => {
-          // Navigate to the main app once the fade-out is complete
-          navigation.replace('Main');
+          // After fade-out, navigate to Main Tab
+          navigation.replace('Main'); // Use replace to avoid going back to Splash
         });
-      }, 1000); // Wait for 1 second before starting the fade-out
+      }, 1000); 
     });
   }, [fadeAnim, navigation]);
 
@@ -40,7 +41,7 @@ const SplashScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.black, // Use the dark gray from colors.js
+    backgroundColor: colors.black, 
     alignItems: 'center',
     justifyContent: 'center',
   },

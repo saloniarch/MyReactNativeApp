@@ -25,7 +25,7 @@ const AppNavigator = () => (
       name="Profile" 
       component={ProfileScreen} 
     />
-  </Stack.Navigator>
+  </Stack.Navigator>  
 );
 
 export default AppNavigator;

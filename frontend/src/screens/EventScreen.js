@@ -5,7 +5,6 @@ import { globalStyles } from '../styles/globalStyles';
 const EventScreen = () => {
   return (
     <View style={globalStyles.container}>
-      <Text style={globalStyles.title}>Events Screen</Text>
     </View>
   );
 };
