@@ -24,7 +24,7 @@ const SettingsScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Logout')}>
-        <Text style={styles.buttonText}>Logout</Text>
+        <Text style={styles.logOutText}>Logout</Text>
       </TouchableOpacity>
     </View>
   );
@@ -48,6 +48,11 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: colors.primary, // Green text
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  logOutText: {
+    color: '#D2AF1D',
     fontWeight: 'bold',
     fontSize: 16,
   },

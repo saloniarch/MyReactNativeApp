@@ -1,5 +1,4 @@
 import axios from 'axios';
-import * as Keychain from 'react-native-keychain';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from 'jwt-decode'; // For decoding JWT to check expiry
 
@@ -18,9 +17,9 @@ export const isValidPassword = (password) => {
 };
 
 // Register function for new users
-export const register = async ({ name, surname, email, password }) => {
-  if (!name || !surname) {
-    throw new Error("Name and surname are required.");
+export const register = async ({ username, email, password }) => {
+  if (!username) {
+    throw new Error("Username is required.");
   }
   if (!isValidEmail(email)) {
     throw new Error("Invalid email format.");
@@ -33,22 +32,36 @@ export const register = async ({ name, surname, email, password }) => {
 
   // API call for registration
   try {
-    const response = await axios.post(`${API_URL}/register`, { name, surname, email, password });
+    const response = await axios.post(`${API_URL}/register`, { username, email, password });
     return response.data; // Return response from the backend (e.g., success message)
   } catch (error) {
     console.error("Registration error:", error);
-    throw new Error(error.response?.data?.message || 'Registration failed');
+
+    // Improved error handling: check if response and response.data exist
+    if (error.response) {
+      console.error("Error response:", error.response);
+      console.error("Error response data:", error.response.data);
+      console.error("Error response status:", error.response.status);
+      const errorMessage = error.response.data?.message || 'Registration failed';
+      throw new Error(errorMessage);
+    } else if (error.request) {
+      console.error("Error request:", error.request);
+      throw new Error("No response received from the server. Please check your network connection.");
+    } else {
+      console.error("Error message:", error.message);
+      throw new Error("An unexpected error occurred: " + error.message);
+    }
   }
 };
 
 // Login function for users
-export const loginUser = async (email, password) => {
-  if (!email || !password) {
-    throw new Error("Email and password are required.");
+export const loginUser = async (username, password) => {
+  if (!username || !password) {
+    throw new Error("Username and password are required.");
   }
 
   try {
-    const response = await axios.post(`${API_URL}/login`, { email, password });
+    const response = await axios.post(`${API_URL}/login`, { username, password });
 
     const { token, user } = response.data;
 
@@ -59,9 +72,9 @@ export const loginUser = async (email, password) => {
       throw new Error("Token has expired");
     }
 
-    // Store the token securely using Keychain
-    await Keychain.setGenericPassword('auth_token', token);
-    await Keychain.setGenericPassword('user_data', JSON.stringify(user));
+    // Store the token securely using AsyncStorage
+    await AsyncStorage.setItem('auth_token', token);
+    await AsyncStorage.setItem('user_data', JSON.stringify(user));
 
     return { token, user }; // Return the token and user info
   } catch (error) {
@@ -73,10 +86,9 @@ export const loginUser = async (email, password) => {
 // Check if token is valid (to be used on app load or before requests)
 export const isTokenValid = async () => {
   try {
-    const credentials = await Keychain.getGenericPassword();
-    if (!credentials) return false; // No token, not authenticated
+    const token = await AsyncStorage.getItem('auth_token');
+    if (!token) return false; // No token, not authenticated
 
-    const token = credentials.password;
     const decodedToken = jwt_decode(token);
     const currentTime = Date.now() / 1000; // Current time in seconds
     return decodedToken.exp > currentTime; // Check if the token has expired
@@ -87,9 +99,12 @@ export const isTokenValid = async () => {
 };
 
 // Fetch user data from token (optional)
-export const fetchUserFromToken = async (token) => {
+export const fetchUserFromToken = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/auth/user', {
+    const token = await AsyncStorage.getItem('auth_token');
+    if (!token) throw new Error('No auth token found');
+
+    const response = await axios.get(`${API_URL}/user`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -103,16 +118,16 @@ export const fetchUserFromToken = async (token) => {
 
 // Logout function
 export const logout = async () => {
-  await Keychain.resetGenericPassword(); // Clear the token from secure storage
-  await Keychain.resetGenericPassword(); // Clear the user data from secure storage
+  await AsyncStorage.removeItem('auth_token'); // Clear the token from secure storage
+  await AsyncStorage.removeItem('user_data'); // Clear the user data from secure storage
 };
 
 // Axios Interceptor for attaching token to all requests
 axios.interceptors.request.use(
   async (config) => {
-    const credentials = await Keychain.getGenericPassword();
-    if (credentials && credentials.password) {
-      config.headers['Authorization'] = `Bearer ${credentials.password}`; // Attach token if available
+    const token = await AsyncStorage.getItem('auth_token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`; // Attach token if available
     }
     return config;
   },
@@ -123,9 +138,9 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   (response) => response, // Proceed with the response if valid
   async (error) => {
-    if (error.response.status === 401) {
+    if (error.response && error.response.status === 401) {
       // Handle token expiration or unauthorized access here
-      await Keychain.resetGenericPassword(); // Clear expired token
+      await AsyncStorage.removeItem('auth_token'); // Clear expired token
       // Optionally navigate to login screen or show an alert
     }
     return Promise.reject(error); // Reject the error if it is not handled
