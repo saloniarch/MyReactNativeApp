@@ -1,81 +1,123 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { globalStyles } from '../styles/globalStyles';
-import Icon from 'react-native-vector-icons/Ionicons';
 
 const ProfileScreen = ({ route, navigation }) => {
-  const { name, username, email, bio, profileImage } = route.params || {};
+  const { name, username, email, bio, profileImage, followers, following, posts } = route.params || {};
 
-  useEffect(() => {
-    // Log to ensure useEffect runs
-    console.log('Setting header options for ProfileScreen');
-
-    // Setting header right icon for the profile screen
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={{ marginRight: 10 }} // Add some margin for positioning
-          onPress={() => navigation.navigate('Settings')}  // Navigate to Settings screen
-        >
-          <Icon name="settings-outline" size={30} color="#8ACE00" /> {/* Icon for Settings */}
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
+  const renderItem = ({ item }) => (
+    <Image source={{ uri: item }} style={styles.postImage} />
+  );
 
   return (
     <View style={[globalStyles.container, styles.container]}>
-      <View style={styles.profilePictureContainer}>
-        <Image
-          source={{ uri: profileImage || 'https://via.placeholder.com/100' }} // Use profileImage or fallback
-          style={styles.profilePicture}
-        />
+      {/* Settings Icon */}
+      <TouchableOpacity 
+        style={styles.settingsIcon} 
+        onPress={() => navigation.navigate('Settings')} 
+        > 
+      <MaterialCommunityIcons name="cog" size={30} color="#8ACE00" /> 
+      </TouchableOpacity>
+
+      <View style={styles.profileHeader}>
+        <Image source={{ uri: profileImage || 'https://via.placeholder.com/100' }} style={styles.profilePicture} />
+        <View style={styles.profileInfo}>
+          <Text style={styles.profileName}>{name || 'John Doe'}</Text>
+          <Text style={styles.profileUsername}>{username || '@johndoe'}</Text>
+          <Text style={styles.profileBio}>{bio || 'This is the bio section.'}</Text>
+          <View style={styles.followInfo}>
+            <Text style={styles.followText}>{followers || 0} Followers</Text>
+            <Text style={styles.followText}>{following || 0} Following</Text>
+          </View>
+        </View>
       </View>
 
-      {/* User Information */}
-      <Text style={[globalStyles.text, styles.userName]}>{name || 'John Doe'}</Text>
-      <Text style={[globalStyles.text, styles.userEmail]}>{email || 'john.doe@example.com'}</Text>
-
       {/* Edit Profile Button */}
-      <TouchableOpacity style={[globalStyles.button, styles.button]} onPress={() => navigation.navigate('EditProfile')}>
-        <Text style={globalStyles.buttonText}>Edit Profile</Text>
+      <TouchableOpacity style={styles.editProfileButton} onPress={() => navigation.navigate('EditProfile')}>
+        <Text style={styles.editProfileButtonText}>Edit Profile</Text>
       </TouchableOpacity>
 
-      {/* Logout Button */}
-      <TouchableOpacity style={[globalStyles.button, styles.button]} onPress={() => navigation.navigate('Logout')}>
-        <Text style={globalStyles.buttonText}>Logout</Text>
-      </TouchableOpacity>
+      {/* Posts Section */}
+      <FlatList
+        data={posts || []}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => index.toString()}
+        numColumns={3}
+        style={styles.postsList}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+    paddingTop: 60, // Adjust padding to position elements correctly
   },
-  profilePictureContainer: {
-    marginBottom: 20,
-    borderRadius: 50,
-    overflow: 'hidden',
-    width: 100,
-    height: 100,
-    borderColor: '#ccc',
-    borderWidth: 1,
+  settingsIcon: {
+    position: 'absolute',
+    top: 55,
+    right: 20,
+  },
+  profileHeader: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    marginBottom: 10,
   },
   profilePicture: {
-    width: '100%',
-    height: '100%',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
-  userName: {
-    fontSize: 24,
+  profileInfo: {
+    marginLeft: 20,
+    flex: 1,
+  },
+  profileName: {
+    fontSize: 20,
     fontWeight: 'bold',
+    color: 'white',
+  },
+  profileUsername: {
+    fontSize: 16,
+    color: 'grey',
     marginBottom: 5,
   },
-  userEmail: {
-    fontSize: 16,
+  profileBio: {
+    fontSize: 14,
+    color: 'white',
+  },
+  followInfo: {
+    flexDirection: 'row',
+    marginTop: 10,
+  },
+  followText: {
+    fontSize: 14,
+    color: 'white',
+    marginRight: 20,
+  },
+  editProfileButton: {
+    padding: 10,
+    borderRadius: 5,
+    borderColor: '#8ACE00',
+    borderWidth: 1,
+    marginHorizontal: 20,
     marginBottom: 20,
+    alignItems: 'center',
+  },
+  editProfileButtonText: {
+    color: '#8ACE00',
+    fontWeight: 'bold',
+  },
+  postsList: {
+    paddingHorizontal: 5,
+  },
+  postImage: {
+    width: '32%',
+    height: 100,
+    margin: 2,
+    borderRadius: 5,
   },
 });
 
