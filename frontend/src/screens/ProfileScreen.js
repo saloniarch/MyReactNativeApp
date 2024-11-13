@@ -1,35 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { globalStyles } from '../styles/globalStyles';
 
 const ProfileScreen = ({ route, navigation }) => {
-  const { name, username, email, bio, profileImage, followers, following, posts } = route.params || {};
+  const { name, username, bio, profileImage } = route.params || {};
 
-  const renderItem = ({ item }) => (
-    <Image source={{ uri: item }} style={styles.postImage} />
-  );
+  // Define the handleSettingsNavigation function
+  const handleSettingsNavigation = () => {
+    navigation.navigate('Settings');
+  };
 
   return (
     <View style={[globalStyles.container, styles.container]}>
-      {/* Settings Icon */}
-      <TouchableOpacity 
-        style={styles.settingsIcon} 
-        onPress={() => navigation.navigate('Settings')} 
-        > 
-      <MaterialCommunityIcons name="cog" size={30} color="#8ACE00" /> 
-      </TouchableOpacity>
-
       <View style={styles.profileHeader}>
         <Image source={{ uri: profileImage || 'https://via.placeholder.com/100' }} style={styles.profilePicture} />
         <View style={styles.profileInfo}>
           <Text style={styles.profileName}>{name || 'John Doe'}</Text>
           <Text style={styles.profileUsername}>{username || '@johndoe'}</Text>
           <Text style={styles.profileBio}>{bio || 'This is the bio section.'}</Text>
-          <View style={styles.followInfo}>
-            <Text style={styles.followText}>{followers || 0} Followers</Text>
-            <Text style={styles.followText}>{following || 0} Following</Text>
-          </View>
         </View>
       </View>
 
@@ -38,14 +27,10 @@ const ProfileScreen = ({ route, navigation }) => {
         <Text style={styles.editProfileButtonText}>Edit Profile</Text>
       </TouchableOpacity>
 
-      {/* Posts Section */}
-      <FlatList
-        data={posts || []}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        numColumns={3}
-        style={styles.postsList}
-      />
+      {/* Settings Icon */}
+      <TouchableOpacity style={styles.settingsIcon} onPress={handleSettingsNavigation}>
+        <MaterialCommunityIcons name="cog" size={30} color="#8ACE00" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -87,15 +72,6 @@ const styles = StyleSheet.create({
   profileBio: {
     fontSize: 14,
     color: 'white',
-  },
-  followInfo: {
-    flexDirection: 'row',
-    marginTop: 10,
-  },
-  followText: {
-    fontSize: 14,
-    color: 'white',
-    marginRight: 20,
   },
   editProfileButton: {
     padding: 10,

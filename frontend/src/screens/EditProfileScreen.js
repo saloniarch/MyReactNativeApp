@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../styles/globalStyles';
@@ -17,7 +17,7 @@ const EditProfileScreen = ({ navigation }) => {
     const loadProfileData = async () => {
       const savedProfile = await AsyncStorage.getItem('profileData');
       if (savedProfile) {
-        const {name, username, email, bio, profileImage } = JSON.parse(savedProfile);
+        const { name, username, email, bio, profileImage } = JSON.parse(savedProfile);
         setName(name || 'John Doe');
         setUsername(username || 'New Username');
         setEmail(email || 'john.doe@example.com');
@@ -54,72 +54,74 @@ const EditProfileScreen = ({ navigation }) => {
         bio: bio,              // Pass the updated bio
         profileImage: profileImage, // Pass the updated profile image URI
       },
-  });
+    });
   };
 
   return (
-    <View style={[globalStyles.container, styles.container]}>
-      {/* Profile Image */}
-      <TouchableOpacity onPress={selectProfileImage} style={styles.imageContainer}>
-        {profileImage ? (
-          <Image source={{ uri: profileImage }} style={styles.profileImage} />
-        ) : (
-          <View style={styles.profileImagePlaceholder}>
-            <Text style={styles.addPhotoText}>Add Photo</Text>
-          </View>
-        )}
-      </TouchableOpacity>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={[globalStyles.container, styles.container]}>
+        {/* Profile Image */}
+        <TouchableOpacity onPress={selectProfileImage} style={styles.imageContainer}>
+          {profileImage ? (
+            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+          ) : (
+            <View style={styles.profileImagePlaceholder}>
+              <Text style={styles.addPhotoText}>Add Photo</Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
-      {/* Name Field */}
-      <View style={styles.fieldContainer}>
-        <Text style={styles.fieldLabel}>Name</Text>
-        <TextInput
-          style={styles.fieldInput}
-          value={name}
-          onChangeText={setName}
-          placeholder="Enter name"
-        />
+        {/* Name Field */}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabel}>Name</Text>
+          <TextInput
+            style={styles.fieldInput}
+            value={name}
+            onChangeText={setName}
+            placeholder="Enter name"
+          />
+        </View>
+
+        {/* Username Field */}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabel}>Username</Text>
+          <TextInput
+            style={styles.fieldInput}
+            value={username}
+            onChangeText={setUsername}
+            placeholder="Enter username"
+          />
+        </View>
+
+        {/* Email Field */}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabel}>Email</Text>
+          <TextInput
+            style={styles.fieldInput}
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Enter email"
+          />
+        </View>
+
+        {/* Bio Field */}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabel}>Bio</Text>
+          <TextInput
+            style={styles.fieldInput}
+            value={bio}
+            onChangeText={setBio}
+            placeholder="Enter bio"
+            multiline
+          />
+        </View>
+
+        {/* Save Changes Button */}
+        <TouchableOpacity style={[globalStyles.button, styles.saveButton]} onPress={saveChangesAndNavigate}>
+          <Text style={globalStyles.buttonText}>Save Changes</Text>
+        </TouchableOpacity>
       </View>
-
-      {/* Username Field */}
-      <View style={styles.fieldContainer}>
-        <Text style={styles.fieldLabel}>Username</Text>
-        <TextInput
-          style={styles.fieldInput}
-          value={username}
-          onChangeText={setUsername}
-          placeholder="Enter username"
-        />
-      </View>
-
-      {/* Email Field */}
-      <View style={styles.fieldContainer}>
-        <Text style={styles.fieldLabel}>Email</Text>
-        <TextInput
-          style={styles.fieldInput}
-          value={email}
-          onChangeText={setEmail}
-          placeholder="Enter email"
-        />
-      </View>
-
-      {/* Bio Field */}
-      <View style={styles.fieldContainer}>
-        <Text style={styles.fieldLabel}>Bio</Text>
-        <TextInput
-          style={styles.fieldInput}
-          value={bio}
-          onChangeText={setBio}
-          placeholder="Enter bio"
-          multiline
-        />
-      </View>
-
-      {/* Save Changes Button */}
-      <TouchableOpacity style={[globalStyles.button, styles.saveButton]} onPress={saveChangesAndNavigate}>
-        <Text style={globalStyles.buttonText}>Save Changes</Text>
-      </TouchableOpacity>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
