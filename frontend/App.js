@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 // Import Screens
 import SplashScreen from './src/screens/SplashScreen';
 import HomeScreen from './src/screens/HomeScreen';
-import EventScreen from './src/screens/EventScreen';
+import CreateEventScreen from './src/screens/CreateEventScreen'; 
 import ProfileScreen from './src/screens/ProfileScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
@@ -23,7 +23,7 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Tab Navigator for main app screens
-const TabNavigator = () => (
+const TabNavigator = ({ openEventModal }) => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
       tabBarIcon: ({ focused, color, size }) => {
@@ -55,43 +55,50 @@ const TabNavigator = () => (
       name="Home" 
       component={HomeScreen} 
       options={{
-        headerShown: true,  // Show header for Home Screen
-        headerTitle: 'Home',  // Set title for Home Screen
-        headerTitleAlign: 'left',  // Align the title to the left
-        headerTitleStyle: { fontWeight: 'bold', fontSize: 26, color: '#8ACE00' }, // Set title color to green
-        headerStyle: { backgroundColor: '#000000' },  // Set header background to black
+        headerShown: true, 
+        headerTitle: 'Home', 
+        headerTitleAlign: 'left', 
+        headerTitleStyle: { fontWeight: 'bold', fontSize: 26, color: '#8ACE00' },
+        headerStyle: { backgroundColor: '#000000' },
       }}
     />
     <Tab.Screen 
       name="Events" 
-      component={EventScreen} 
+      component={HomeScreen} 
+      listeners={{
+        tabPress: (e) => {
+          e.preventDefault();
+          openEventModal(); 
+        },
+      }}
       options={{
-        headerShown: true,  // Show header for Event Screen
-        headerTitle: 'Create an Event',  // Set title for Event Screen
-        headerTitleAlign: 'left',  // Align the title to the left
-        headerTitleStyle: { fontWeight: 'bold', fontSize: 26, color: '#8ACE00' }, // Set title color to green
-        headerStyle: { backgroundColor: '#000000' },  // Set header background to black
+        headerShown: false, 
       }}
     />
     <Tab.Screen 
       name="Chat" 
       component={ChatScreen} 
-      options={{
-        headerShown: false, // Hide header for Chat Screen
-      }}
+      options={{ headerShown: false }}
     />
     <Tab.Screen 
       name="Profile" 
       component={ProfileScreen} 
-      options={{
-        headerShown: false, // Hide header for Profile Screen
-      }}
+      options={{ headerShown: false }}
     />
   </Tab.Navigator>
 );
 
-// App Component
 const App = () => {
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const openEventModal = () => {
+    setModalVisible(true);
+  };
+
+  const closeEventModal = () => {
+    setModalVisible(false);
+  };
+
   return (
     <AuthProvider>
       <UserProvider>
@@ -100,13 +107,17 @@ const App = () => {
             {/* Splash Screen */}
             <Stack.Screen name="Splash" component={SplashScreen} />
             {/* Main App Tab Navigator */}
-            <Stack.Screen name="Main" component={TabNavigator} />
+            <Stack.Screen name="Main">
+              {(props) => <TabNavigator {...props} openEventModal={openEventModal} />}
+            </Stack.Screen>
             {/* Other Screens */}
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="Logout" component={AuthScreen} />
           </Stack.Navigator>
         </NavigationContainer>
+        {/* Render CreateEventScreen modal */}
+        <CreateEventScreen isVisible={isModalVisible} onClose={closeEventModal} />
       </UserProvider>
     </AuthProvider>
   );
