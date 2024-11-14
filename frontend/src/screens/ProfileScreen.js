@@ -11,7 +11,7 @@ const ProfileScreen = ({ navigation }) => {
   // Fetch user data from AsyncStorage
   const fetchUserData = async () => {
     try {
-      const storedUser = await AsyncStorage.getItem('user_data');
+      const storedUser = await AsyncStorage.getItem('profileData'); // Changed key to 'profileData'
       if (storedUser) {
         setUserData(JSON.parse(storedUser));
       }
@@ -38,7 +38,6 @@ const ProfileScreen = ({ navigation }) => {
         <Image source={{ uri: userData.profileImage || 'https://via.placeholder.com/100' }} style={styles.profilePicture} />
         <View style={styles.profileInfo}>
           <Text style={styles.profileUsername}>{userData.username || '@username'}</Text>
-          <Text style={styles.profileEmail}>{userData.email || 'email@example.com'}</Text>
         </View>
       </View>
 
@@ -78,16 +77,12 @@ const styles = StyleSheet.create({
   profileInfo: {
     marginLeft: 20,
     flex: 1,
+    color:'white',
   },
   profileUsername: {
     fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
-  },
-  profileEmail: {
-    fontSize: 16,
-    color: 'grey',
-    marginBottom: 5,
   },
   editProfileButton: {
     padding: 10,

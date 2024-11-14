@@ -28,18 +28,24 @@ const EditProfileScreen = ({ navigation }) => {
     loadProfileData();
   }, []);
 
-  // Handle profile image selection
-  const selectProfileImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      setProfileImage(result.uri);
-    }
+// Request permissions and handle profile image selection 
+  const selectProfileImage = async () => { 
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync(); 
+    if (status !== 'granted') { 
+      alert('Sorry, we need camera roll permissions to make this work!'); 
+      return;
+    } 
+    
+    let result = await ImagePicker.launchImageLibraryAsync({ 
+      mediaTypes: ImagePicker.MediaType.Images, 
+      allowsEditing: true, 
+      aspect: [1, 1], 
+      quality: 1, 
+    }); 
+    
+    if (!result.cancelled) { 
+      setProfileImage(result.uri); 
+    } 
   };
 
   // Save profile data to AsyncStorage and navigate 
@@ -47,12 +53,12 @@ const EditProfileScreen = ({ navigation }) => {
     const profileData = { name, username, email, bio, profileImage }; 
     try { 
       await AsyncStorage.setItem('profileData', JSON.stringify(profileData)); 
-      navigation.navigate("Main", { 
-        screen: "Profile", 
+      navigation.navigate('Main', { 
+        screen: 'Profile', 
         params: profileData, 
       }); 
     } catch (error) { 
-      console.error("Error saving profile data:", error); 
+      console.error('Error saving profile data:', error); 
     } 
   };
 
@@ -68,8 +74,9 @@ const EditProfileScreen = ({ navigation }) => {
               <Image source={{ uri: profileImage }} style={styles.profileImage} />
             ) : (
               <View style={styles.profileImagePlaceholder}>
-                <Text style={{color: colors.white, fontFamily: 'Anton', fontSize: 18}}>
-                Add Photo</Text>
+                <Text style={{ color: colors.white, fontFamily: 'Anton', fontSize: 18 }}>
+                  Add Photo
+                </Text>
               </View>
             )}
           </TouchableOpacity>
@@ -120,12 +127,12 @@ const EditProfileScreen = ({ navigation }) => {
               maxLength={200}
               placeholderTextColor={colors.beige}
             />
-            <Text style={styles.characterCount}>{bio.length}/200</Text> {/* Show character count */}
+            <Text style={styles.characterCount}>{bio.length}/200</Text>
           </View>
 
           <TouchableOpacity style={[globalStyles.button, styles.saveButton]} onPress={saveChangesAndNavigate}>
             <Text style={styles.saveButtonText}>Save Changes</Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
 
         </View>
       </TouchableWithoutFeedback>
@@ -160,36 +167,35 @@ const styles = StyleSheet.create({
   addPhotoText: {
     color: colors.white,
   },
-    fieldContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      marginVertical: 15,
-      width: '100%',
-    },
-    fieldLabel: {
-      color: colors.yellow,
-      fontWeight: 'bold',
-      flex: 1,
-      fontSize: 14,
-      paddingLeft: 15,
-    },
-    fieldInput: {
-      flex: 2,
-      height: 40, 
-      backgroundColor: 'transparent',
-      borderWidth: 2,
-      borderColor: colors.yellow,
-      borderRadius: 10,
-      paddingHorizontal: 10,
-      color: colors.white,
-      fontSize: 14,
-      textAlignVertical: 'center',
-    },
-
+  fieldContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    marginVertical: 15,
+    width: '100%',
+  },
+  fieldLabel: {
+    color: colors.yellow,
+    fontWeight: 'bold',
+    flex: 1,
+    fontSize: 14,
+    paddingLeft: 15,
+  },
+  fieldInput: {
+    flex: 2,
+    height: 40, 
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: colors.yellow,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    color: colors.white,
+    fontSize: 14,
+    textAlignVertical: 'center',
+  },
   bioInput: {
     height: 70, 
-    textAlignVertical: 'center',
+    textAlignVertical: 'top', // Changed 'center' to 'top'
     paddingTop: 20,
     alignItems: 'center'
   },
@@ -215,7 +221,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: 'bold',
     textAlign: 'center',
-  },  
+  },
 });
 
 export default EditProfileScreen;
