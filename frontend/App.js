@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import Screens
 import SplashScreenComponent from './src/screens/SplashScreen';
@@ -96,7 +97,7 @@ const TabNavigator = ({ openEventModal }) => (
 );
 
 const App = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false); 
 
   const openEventModal = () => setIsModalVisible(true);
 
@@ -123,6 +124,7 @@ const App = () => {
   return (
     <AuthProvider>
       <UserProvider>
+       <GestureHandlerRootView style={{ flex: 1}}>
         <NavigationContainer onReady={onLayoutRootView}>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Splash" component={SplashScreenComponent} />
@@ -134,6 +136,7 @@ const App = () => {
           </Stack.Navigator>
         </NavigationContainer>
         <CreateEventScreen isVisible={isModalVisible} onClose={closeEventModal} />
+        </GestureHandlerRootView>
       </UserProvider>
     </AuthProvider>
   );
