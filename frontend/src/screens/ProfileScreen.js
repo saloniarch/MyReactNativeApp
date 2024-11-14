@@ -1,12 +1,33 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 import { globalStyles } from '../styles/globalStyles';
 
-const ProfileScreen = ({ route, navigation }) => {
-  const { name, username, bio, profileImage } = route.params || {};
+const ProfileScreen = ({ navigation }) => {
+  const [userData, setUserData] = useState({});
 
-  // Define the handleSettingsNavigation function
+  // Fetch user data from AsyncStorage
+  const fetchUserData = async () => {
+    try {
+      const storedUser = await AsyncStorage.getItem('profileData'); // Changed key to 'profileData'
+      if (storedUser) {
+        setUserData(JSON.parse(storedUser));
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  // Refresh user data every time the screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserData();
+    }, [])
+  );
+
+  // Navigate to settings screen
   const handleSettingsNavigation = () => {
     navigation.navigate('Settings');
   };
@@ -14,11 +35,9 @@ const ProfileScreen = ({ route, navigation }) => {
   return (
     <View style={[globalStyles.container, styles.container]}>
       <View style={styles.profileHeader}>
-        <Image source={{ uri: profileImage || 'https://via.placeholder.com/100' }} style={styles.profilePicture} />
+        <Image source={{ uri: userData.profileImage || 'https://via.placeholder.com/100' }} style={styles.profilePicture} />
         <View style={styles.profileInfo}>
-          <Text style={styles.profileName}>{name || 'John Doe'}</Text>
-          <Text style={styles.profileUsername}>{username || '@johndoe'}</Text>
-          <Text style={styles.profileBio}>{bio || 'This is the bio section.'}</Text>
+          <Text style={styles.profileUsername}>{userData.username || '@username'}</Text>
         </View>
       </View>
 
@@ -29,7 +48,7 @@ const ProfileScreen = ({ route, navigation }) => {
 
       {/* Settings Icon */}
       <TouchableOpacity style={styles.settingsIcon} onPress={handleSettingsNavigation}>
-        <MaterialCommunityIcons name="cog" size={30} color="#8ACE00" />
+        <MaterialCommunityIcons name="cog-outline" size={30} color="#8ACE00" />
       </TouchableOpacity>
     </View>
   );
@@ -58,19 +77,11 @@ const styles = StyleSheet.create({
   profileInfo: {
     marginLeft: 20,
     flex: 1,
-  },
-  profileName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
+    color:'white',
   },
   profileUsername: {
-    fontSize: 16,
-    color: 'grey',
-    marginBottom: 5,
-  },
-  profileBio: {
-    fontSize: 14,
+    fontSize: 20,
+    fontWeight: 'bold',
     color: 'white',
   },
   editProfileButton: {
@@ -85,15 +96,6 @@ const styles = StyleSheet.create({
   editProfileButtonText: {
     color: '#8ACE00',
     fontWeight: 'bold',
-  },
-  postsList: {
-    paddingHorizontal: 5,
-  },
-  postImage: {
-    width: '32%',
-    height: 100,
-    margin: 2,
-    borderRadius: 5,
   },
 });
 
