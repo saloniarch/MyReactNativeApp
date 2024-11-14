@@ -1,8 +1,8 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import 'react-native-gesture-handler';
-import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
+import 'react-native-gesture-handler';
 import * as SplashScreen from 'expo-splash-screen';
+import { NavigationContainer } from '@react-navigation/native';
+import React, { useState, useCallback, useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import Navigation
@@ -10,8 +10,8 @@ import AppNavigator from './src/navigation/AppNavigator';
 import CreateEventScreen from './src/screens/CreateEventScreen';
 
 // Auth Context
-import { AuthProvider } from './src/contexts/AuthContext';
 import { UserProvider } from './src/contexts/UserContext';
+import { AuthProvider } from './src/contexts/AuthContext';
 
 const App = () => {
   const [isModalVisible, setIsModalVisible] = useState(false); 

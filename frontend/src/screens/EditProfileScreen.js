@@ -11,18 +11,20 @@ const EditProfileScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [bio, setBio] = useState('');
+  const [originalData, setOriginalData] = useState({});  // Store the original data
 
   // Load data from AsyncStorage on mount
   useEffect(() => {
     const loadProfileData = async () => {
       const savedProfile = await AsyncStorage.getItem('profileData');
       if (savedProfile) {
-        const { name, username, email, bio, profileImage } = JSON.parse(savedProfile);
-        setName(name || '');
-        setUsername(username || '');
-        setEmail(email || '');
-        setBio(bio || '');
-        setProfileImage(profileImage || null);
+        const parsedProfile = JSON.parse(savedProfile);
+        setOriginalData(parsedProfile);  // Store for resetting
+        setName(parsedProfile.name || '');
+        setUsername(parsedProfile.username || '');
+        setEmail(parsedProfile.email || '');
+        setBio(parsedProfile.bio || '');
+        setProfileImage(parsedProfile.profileImage || null);
       }
     };
     loadProfileData();
@@ -54,19 +56,38 @@ const EditProfileScreen = ({ navigation }) => {
     }
   };
 
+  // Save profile data to AsyncStorage
+  const saveChanges = async () => {
+    const profileData = { name, username, email, bio, profileImage };
+    try {
+      await AsyncStorage.setItem('profileData', JSON.stringify(profileData));
+      setOriginalData(profileData);  // Update original data with saved changes
+      alert('Changes saved successfully');
+    } catch (error) {
+      console.error('Error saving profile data:', error);
+    }
+  };
 
-  // Save profile data to AsyncStorage and navigate 
-  const saveChangesAndNavigate = async () => { 
-    const profileData = { name, username, email, bio, profileImage }; 
-    try { 
-      await AsyncStorage.setItem('profileData', JSON.stringify(profileData)); 
-      navigation.navigate('Main', { 
-        screen: 'Profile', 
-        params: profileData, 
-      }); 
-    } catch (error) { 
-      console.error('Error saving profile data:', error); 
-    } 
+  // Reset fields to original data or navigate back
+  const handleCancel = () => {
+    if (
+      name !== originalData.name ||
+      username !== originalData.username ||
+      email !== originalData.email ||
+      bio !== originalData.bio ||
+      profileImage !== originalData.profileImage
+    ) {
+      // Reset to last saved data
+      setName(originalData.name || '');
+      setUsername(originalData.username || '');
+      setEmail(originalData.email || '');
+      setBio(originalData.bio || '');
+      setProfileImage(originalData.profileImage || null);
+      alert('Changes discarded');
+    } else {
+      // Navigate back if no unsaved changes
+      navigation.goBack();
+    }
   };
 
   return (
@@ -137,8 +158,12 @@ const EditProfileScreen = ({ navigation }) => {
             <Text style={styles.characterCount}>{bio.length}/200</Text>
           </View>
 
-          <TouchableOpacity style={[globalStyles.button, styles.saveButton]} onPress={saveChangesAndNavigate}>
-            <Text style={styles.saveButtonText}>Save Changes</Text>
+          <TouchableOpacity style={[globalStyles.button, styles.saveButton]} onPress={saveChanges}>
+            <Text style={styles.saveButtonText}>SAVE CHANGES</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[globalStyles.button, styles.cancelButton]} onPress={handleCancel}>
+            <Text style={styles.cancelButtonText}>CANCEL</Text>
           </TouchableOpacity>
 
         </View>
@@ -222,10 +247,26 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
   },
+  cancelButton: {
+    marginTop: 15,
+    borderRadius: 5,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.yellow,
+    paddingVertical: 9,
+    width: 200,
+    },
   saveButtonText: {
     fontFamily: 'Anton',
     fontSize: 20,
     color: colors.primary,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  cancelButtonText: {
+    fontFamily: 'Anton',
+    fontSize: 17,
+    color: colors.yellow,
     fontWeight: 'bold',
     textAlign: 'center',
   },
