@@ -3,15 +3,19 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import { globalStyles } from '../styles/globalStyles';
 
 const ProfileScreen = ({ navigation }) => {
   const [userData, setUserData] = useState({});
+  const [fontsLoaded] = useFonts({
+    'Anton': require('../../assets/fonts/Anton-Regular.ttf'),
+  });
 
   // Fetch user data from AsyncStorage
   const fetchUserData = async () => {
     try {
-      const storedUser = await AsyncStorage.getItem('profileData'); // Changed key to 'profileData'
+      const storedUser = await AsyncStorage.getItem('profileData');
       if (storedUser) {
         setUserData(JSON.parse(storedUser));
       }
@@ -32,18 +36,26 @@ const ProfileScreen = ({ navigation }) => {
     navigation.navigate('Settings');
   };
 
+  if (!fontsLoaded) {
+    return null; // Return null until fonts are loaded to prevent rendering
+  }
+
   return (
     <View style={[globalStyles.container, styles.container]}>
       <View style={styles.profileHeader}>
         <Image source={{ uri: userData.profileImage || 'https://via.placeholder.com/100' }} style={styles.profilePicture} />
         <View style={styles.profileInfo}>
+          {/* Display Name Above Username */}
+          {userData.name && <Text style={styles.profileName}>{userData.name}</Text>}
           <Text style={styles.profileUsername}>{userData.username || '@username'}</Text>
+          {/* Display Bio */}
+          {userData.bio && <Text style={styles.profileBio}>{userData.bio}</Text>}
         </View>
       </View>
 
       {/* Edit Profile Button */}
       <TouchableOpacity style={styles.editProfileButton} onPress={() => navigation.navigate('EditProfile')}>
-        <Text style={styles.editProfileButtonText}>Edit Profile</Text>
+        <Text style={styles.editProfileButtonText}>EDIT PROFILE</Text>
       </TouchableOpacity>
 
       {/* Settings Icon */}
@@ -56,7 +68,7 @@ const ProfileScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 60, // Adjust padding to position elements correctly
+    paddingTop: 60,
   },
   settingsIcon: {
     position: 'absolute',
@@ -77,12 +89,24 @@ const styles = StyleSheet.create({
   profileInfo: {
     marginLeft: 20,
     flex: 1,
-    color:'white',
+    color: 'white',
   },
-  profileUsername: {
+  profileName: {
     fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
+    marginBottom: 5, 
+  },
+  profileUsername: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  profileBio: {
+    fontSize: 17,
+    color: 'white',
+    marginTop: 20,
+    fontStyle: 'italic',
   },
   editProfileButton: {
     padding: 10,
@@ -94,8 +118,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editProfileButtonText: {
+    fontFamily: 'Anton',
     color: '#8ACE00',
     fontWeight: 'bold',
+    fontSize: 15,
   },
 });
 

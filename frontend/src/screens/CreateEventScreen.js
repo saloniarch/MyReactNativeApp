@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
         color: '#8ACE00',
     },
     label: {
-        color: '#FFFFFF', // White color for labels
+        color: '#FFFFFF',
         fontSize: 16,
         marginBottom: 5,
     },

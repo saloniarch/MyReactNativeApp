@@ -10,14 +10,14 @@ const SplashScreen = ({ navigation }) => {
     // Start fade-in effect
     Animated.timing(fadeAnim, {
       toValue: 1, // Fade in to fully visible
-      duration: 2000, 
+      duration: 1000, 
       useNativeDriver: true,
     }).start(() => {
       setTimeout(() => {
         // After 1 second, fade-out and navigate to Main
         Animated.timing(fadeAnim, {
           toValue: 0, 
-          duration: 1500,
+          duration: 900,
           useNativeDriver: true,
         }).start(() => {
           // After fade-out, navigate to Main Tab

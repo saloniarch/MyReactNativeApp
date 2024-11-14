@@ -4,7 +4,7 @@ import jwt_decode from 'jwt-decode';
 
 const API_URL = __DEV__ ? "http://10.0.0.13:5000/api/auth" : "https://yourapi.com/api/auth"; // Dynamic API URL
 
-// Create an Axios instance with timeout and baseURL
+// Axios instance with timeout and baseURL
 const api = axios.create({
   baseURL: API_URL,
   timeout: 10000,

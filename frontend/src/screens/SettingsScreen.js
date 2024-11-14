@@ -4,7 +4,6 @@ import { useFonts } from 'expo-font';
 import colors from '../styles/colors';
 
 const SettingsScreen = ({ navigation }) => {
-  // Use the useFonts hook to load the Anton font
   const [fontsLoaded] = useFonts({
     Anton: require('../../assets/fonts/Anton-Regular.ttf'),
   });

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -24,7 +24,7 @@ import { UserProvider } from './src/contexts/UserContext';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const TabNavigator = () => (
+const TabNavigator = ({ openEventModal }) => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
       tabBarIcon: ({ focused, color, size }) => {
@@ -74,7 +74,7 @@ const TabNavigator = () => (
       listeners={{
         tabPress: (e) => {
           e.preventDefault();
-          openEventModal(); 
+          openEventModal(); // Open the modal when the Events tab is pressed
         },
       }}
       options={{
@@ -96,19 +96,22 @@ const TabNavigator = () => (
 );
 
 const App = () => {
-  // Load the Anton font using useFonts hook
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const openEventModal = () => setIsModalVisible(true);
+
+  const closeEventModal = () => setIsModalVisible(false);
+
   const [fontsLoaded] = useFonts({
     'Anton': require('./assets/fonts/Anton-Regular.ttf'),
   });
 
   useEffect(() => {
-    // Keep the splash screen visible while fonts are loading
     SplashScreen.preventAutoHideAsync();
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
-      // Hide the splash screen once fonts are loaded
       await SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
@@ -123,14 +126,13 @@ const App = () => {
         <NavigationContainer onReady={onLayoutRootView}>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Splash" component={SplashScreenComponent} />
-            <Stack.Screen name="Main" component={TabNavigator} />
+            <Stack.Screen name="Main" children={() => <TabNavigator openEventModal={openEventModal} />} />
             <Stack.Screen name="Chat" component={ChatScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="Logout" component={AuthScreen} />
           </Stack.Navigator>
         </NavigationContainer>
-        {/* Render CreateEventScreen modal */}
         <CreateEventScreen isVisible={isModalVisible} onClose={closeEventModal} />
       </UserProvider>
     </AuthProvider>

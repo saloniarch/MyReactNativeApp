@@ -28,25 +28,32 @@ const EditProfileScreen = ({ navigation }) => {
     loadProfileData();
   }, []);
 
-// Request permissions and handle profile image selection 
-  const selectProfileImage = async () => { 
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync(); 
-    if (status !== 'granted') { 
-      alert('Sorry, we need camera roll permissions to make this work!'); 
-      return;
-    } 
-    
-    let result = await ImagePicker.launchImageLibraryAsync({ 
-      mediaTypes: ImagePicker.MediaType.Images, 
-      allowsEditing: true, 
-      aspect: [1, 1], 
-      quality: 1, 
-    }); 
-    
-    if (!result.cancelled) { 
-      setProfileImage(result.uri); 
-    } 
+  // Request permissions and handle profile image selection
+  const selectProfileImage = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Sorry, we need camera roll permissions to make this work!');
+        return;
+      }
+
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.cancelled && result.assets && result.assets.length > 0) {
+        setProfileImage(result.assets[0].uri);
+      } else {
+        console.log('Image selection cancelled');
+      }
+    } catch (error) {
+      console.error('Error selecting image:', error);
+    }
   };
+
 
   // Save profile data to AsyncStorage and navigate 
   const saveChangesAndNavigate = async () => { 
@@ -64,7 +71,7 @@ const EditProfileScreen = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} // Adjust the behavior based on platform
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={globalStyles.container}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -195,7 +202,7 @@ const styles = StyleSheet.create({
   },
   bioInput: {
     height: 70, 
-    textAlignVertical: 'top', // Changed 'center' to 'top'
+    textAlignVertical: 'top',
     paddingTop: 20,
     alignItems: 'center'
   },
