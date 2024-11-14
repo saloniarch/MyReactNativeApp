@@ -44,15 +44,14 @@ const EditProfileScreen = ({ navigation }) => {
 
   // After saving the profile changes, navigate to Profile tab within Main
   const saveChangesAndNavigate = () => {
-    // Save changes here, then navigate
     navigation.navigate("Main", {
-      screen: "Profile", // This tells Main to go directly to the Profile tab
+      screen: "Profile",
       params: {
-        name: name,             // Pass the updated name
-        username: username,     // Pass the updated username
-        email: email,          // Pass the updated email
-        bio: bio,              // Pass the updated bio
-        profileImage: profileImage, // Pass the updated profile image URI
+        name: name,
+        username: username,
+        email: email,
+        bio: bio,
+        profileImage: profileImage,
       },
     });
   };
@@ -60,7 +59,6 @@ const EditProfileScreen = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={[globalStyles.container, styles.container]}>
-        {/* Profile Image */}
         <TouchableOpacity onPress={selectProfileImage} style={styles.imageContainer}>
           {profileImage ? (
             <Image source={{ uri: profileImage }} style={styles.profileImage} />
@@ -71,7 +69,6 @@ const EditProfileScreen = ({ navigation }) => {
           )}
         </TouchableOpacity>
 
-        {/* Name Field */}
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldLabel}>Name</Text>
           <TextInput
@@ -82,7 +79,6 @@ const EditProfileScreen = ({ navigation }) => {
           />
         </View>
 
-        {/* Username Field */}
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldLabel}>Username</Text>
           <TextInput
@@ -93,7 +89,6 @@ const EditProfileScreen = ({ navigation }) => {
           />
         </View>
 
-        {/* Email Field */}
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldLabel}>Email</Text>
           <TextInput
@@ -104,7 +99,6 @@ const EditProfileScreen = ({ navigation }) => {
           />
         </View>
 
-        {/* Bio Field */}
         <View style={styles.fieldContainer}>
           <Text style={styles.fieldLabel}>Bio</Text>
           <TextInput
@@ -116,7 +110,6 @@ const EditProfileScreen = ({ navigation }) => {
           />
         </View>
 
-        {/* Save Changes Button */}
         <TouchableOpacity style={[globalStyles.button, styles.saveButton]} onPress={saveChangesAndNavigate}>
           <Text style={globalStyles.buttonText}>Save Changes</Text>
         </TouchableOpacity>

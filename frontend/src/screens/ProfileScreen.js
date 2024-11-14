@@ -1,10 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../styles/globalStyles';
 
 const ProfileScreen = ({ route, navigation }) => {
-  const { name, username, bio, profileImage } = route.params || {};
+  const [userData, setUserData] = useState({});
+
+  // Fetch data from AsyncStorage
+  const fetchUserData = async () => {
+    try {
+      const storedUser = await AsyncStorage.getItem('user_data');
+      if (storedUser) {
+        setUserData(JSON.parse(storedUser));
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData(); // Fetch user data when the component mounts
+  }, []);
 
   // Define the handleSettingsNavigation function
   const handleSettingsNavigation = () => {
@@ -14,11 +31,10 @@ const ProfileScreen = ({ route, navigation }) => {
   return (
     <View style={[globalStyles.container, styles.container]}>
       <View style={styles.profileHeader}>
-        <Image source={{ uri: profileImage || 'https://via.placeholder.com/100' }} style={styles.profilePicture} />
+        <Image source={{ uri: userData.profileImage || 'https://via.placeholder.com/100' }} style={styles.profilePicture} />
         <View style={styles.profileInfo}>
-          <Text style={styles.profileName}>{name || 'John Doe'}</Text>
-          <Text style={styles.profileUsername}>{username || '@johndoe'}</Text>
-          <Text style={styles.profileBio}>{bio || 'This is the bio section.'}</Text>
+          <Text style={styles.profileUsername}>{userData.username || '@username'}</Text>
+          <Text style={styles.profileEmail}>{userData.email || 'email@example.com'}</Text>
         </View>
       </View>
 
@@ -59,19 +75,15 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     flex: 1,
   },
-  profileName: {
+  profileUsername: {
     fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
   },
-  profileUsername: {
+  profileEmail: {
     fontSize: 16,
     color: 'grey',
     marginBottom: 5,
-  },
-  profileBio: {
-    fontSize: 14,
-    color: 'white',
   },
   editProfileButton: {
     padding: 10,
@@ -85,15 +97,6 @@ const styles = StyleSheet.create({
   editProfileButtonText: {
     color: '#8ACE00',
     fontWeight: 'bold',
-  },
-  postsList: {
-    paddingHorizontal: 5,
-  },
-  postImage: {
-    width: '32%',
-    height: 100,
-    margin: 2,
-    borderRadius: 5,
   },
 });
 

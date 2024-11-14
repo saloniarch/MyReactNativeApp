@@ -43,6 +43,7 @@ const AuthScreen = ({ navigation }) => {
           placeholder="Username"
           value={username}
           onChangeText={setUsername}
+          autoCapitalize="none"
           placeholderTextColor="#00000"
         />
       )}
@@ -65,6 +66,7 @@ const AuthScreen = ({ navigation }) => {
           placeholder="Username"
           value={username}
           onChangeText={setUsername}
+          autoCapitalize="none"
           placeholderTextColor="#00000"
         />
       )}
@@ -125,12 +127,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 20,
-    backgroundColor: '#8ACE00', // Green button background
+    backgroundColor: '#8ACE00',
     alignItems: 'center',
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#000000', // Black text on the button
+    color: '#000000',
     fontWeight: 'bold',
     fontSize: 16,
   },

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import colors from '../styles/colors'; // Ensure you have the colors module available
+import colors from '../styles/colors';
 
 const SettingsScreen = ({ navigation }) => {
   return (
