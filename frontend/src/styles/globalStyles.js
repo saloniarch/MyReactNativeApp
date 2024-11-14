@@ -33,7 +33,7 @@ export const globalStyles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     paddingVertical: 8,
-    backgroundColor: '#444',
+    backgroundColor: colors.beige,
     borderRadius: 20,
     paddingHorizontal: 15,
     borderColor: colors.white,
@@ -83,7 +83,7 @@ export const globalStyles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   otherUserBubble: {
-    backgroundColor: '#555',           // Color for other user's messages
+    backgroundColor: colors.yellow,           // Color for other user's messages
     padding: 10,
     borderRadius: 20,
     maxWidth: '75%',
@@ -110,7 +110,7 @@ export const globalStyles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 15,
     paddingVertical: 10,
-    backgroundColor: '#333', // Lighter black for blending
+    backgroundColor: colors.yellow,
     borderRadius: 25,        // Rounded edges
     marginHorizontal: 10,
     marginVertical: 10,

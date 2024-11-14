@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 import { globalStyles } from '../styles/globalStyles';
 
-const ProfileScreen = ({ route, navigation }) => {
+const ProfileScreen = ({ navigation }) => {
   const [userData, setUserData] = useState({});
 
-  // Fetch data from AsyncStorage
+  // Fetch user data from AsyncStorage
   const fetchUserData = async () => {
     try {
       const storedUser = await AsyncStorage.getItem('user_data');
@@ -19,11 +20,14 @@ const ProfileScreen = ({ route, navigation }) => {
     }
   };
 
-  useEffect(() => {
-    fetchUserData(); // Fetch user data when the component mounts
-  }, []);
+  // Refresh user data every time the screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserData();
+    }, [])
+  );
 
-  // Define the handleSettingsNavigation function
+  // Navigate to settings screen
   const handleSettingsNavigation = () => {
     navigation.navigate('Settings');
   };
@@ -45,7 +49,7 @@ const ProfileScreen = ({ route, navigation }) => {
 
       {/* Settings Icon */}
       <TouchableOpacity style={styles.settingsIcon} onPress={handleSettingsNavigation}>
-        <MaterialCommunityIcons name="cog" size={30} color="#8ACE00" />
+        <MaterialCommunityIcons name="cog-outline" size={30} color="#8ACE00" />
       </TouchableOpacity>
     </View>
   );

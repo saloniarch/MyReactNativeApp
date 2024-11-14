@@ -143,7 +143,7 @@ const ChatScreen = () => {
         </TouchableOpacity>
         <TextInput
           style={globalStyles.input}
-          placeholder="Type a message"
+          placeholder="Message..."
           value={text}
           onChangeText={setText}
           onSubmitEditing={sendMessage}

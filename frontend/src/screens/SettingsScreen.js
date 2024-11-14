@@ -1,11 +1,26 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useFonts } from 'expo-font';
 import colors from '../styles/colors';
 
 const SettingsScreen = ({ navigation }) => {
+  // Use the useFonts hook to load the Anton font
+  const [fontsLoaded] = useFonts({
+    Anton: require('../../assets/fonts/Anton-Regular.ttf'),
+  });
+
+  // Show a placeholder while the font is loading
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Settings</Text>
+      <Text style={[styles.text, { fontFamily: 'Anton', fontSize: 38, color: '#8ACE00' }]}>SETTINGS</Text>
 
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ChangePassword')}>
         <Text style={styles.buttonText}>Change Password</Text>
@@ -24,7 +39,7 @@ const SettingsScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Logout')}>
-        <Text style={styles.logOutText}>Logout</Text>
+        <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
     </View>
   );
@@ -37,6 +52,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.black,
   },
+  loadingText: {
+    color: colors.primary,
+    fontSize: 24,
+  },
   text: {
     color: colors.white,
     fontSize: 24,
@@ -47,12 +66,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   buttonText: {
-    color: colors.primary, // Green text
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  logOutText: {
-    color: '#D2AF1D',
+    color: colors.yellow,
     fontWeight: 'bold',
     fontSize: 16,
   },

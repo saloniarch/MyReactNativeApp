@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 
 // Import Screens
-import SplashScreen from './src/screens/SplashScreen';
+import SplashScreenComponent from './src/screens/SplashScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import EventScreen from './src/screens/EventScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
@@ -19,89 +21,104 @@ import AuthScreen from './src/screens/AuthScreen';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { UserProvider } from './src/contexts/UserContext';
 
-const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
-// Tab Navigator for main app screens
 const TabNavigator = () => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
       tabBarIcon: ({ focused, color, size }) => {
         let iconName;
-
         if (route.name === 'Home') {
           iconName = focused ? 'home' : 'home-outline';
-        } else if (route.name === 'Chat') {
-          iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
         } else if (route.name === 'Profile') {
           iconName = focused ? 'person' : 'person-outline';
         } else if (route.name === 'Events') {
           iconName = focused ? 'add-circle' : 'add-circle-outline';
         }
-
         return <Icon name={iconName} size={size} color={color} />;
       },
-      tabBarActiveTintColor: '#8ACE00', // Green color for active icons
-      tabBarInactiveTintColor: 'gray',   // Gray for inactive icons
+      tabBarActiveTintColor: '#8ACE00',
+      tabBarInactiveTintColor: 'gray',
       tabBarStyle: {
         height: 80,
         paddingTop: 15,
         paddingBottom: 24,
-        backgroundColor: '#000000', // Black background for tab bar
+        backgroundColor: '#000000',
       },
     })}
   >
     <Tab.Screen 
       name="Home" 
       component={HomeScreen} 
-      options={{
-        headerShown: true,  // Show header for Home Screen
-        headerTitle: 'Home',  // Set title for Home Screen
-        headerTitleAlign: 'left',  // Align the title to the left
-        headerTitleStyle: { fontWeight: 'bold', fontSize: 26, color: '#8ACE00' }, // Set title color to green
-        headerStyle: { backgroundColor: '#000000' },  // Set header background to black
-      }}
+      options={({ navigation }) => ({
+        headerShown: true,
+        headerTitle: 'HOME',
+        headerTitleAlign: 'left',
+        headerTitleStyle: { fontFamily: 'Anton', fontWeight: 'bold', fontSize: 26, color: '#8ACE00' },
+        headerStyle: { backgroundColor: '#000000' },
+        headerRight: () => (
+          <Icon.Button
+            name="chatbubbles-outline"
+            size={25}
+            backgroundColor="#000000"
+            color="#8ACE00"
+            onPress={() => navigation.navigate('Chat')}
+          />
+        ),
+      })}
     />
     <Tab.Screen 
       name="Events" 
       component={EventScreen} 
       options={{
-        headerShown: true,  // Show header for Event Screen
-        headerTitle: 'Create an Event',  // Set title for Event Screen
-        headerTitleAlign: 'left',  // Align the title to the left
-        headerTitleStyle: { fontWeight: 'bold', fontSize: 26, color: '#8ACE00' }, // Set title color to green
-        headerStyle: { backgroundColor: '#000000' },  // Set header background to black
-      }}
-    />
-    <Tab.Screen 
-      name="Chat" 
-      component={ChatScreen} 
-      options={{
-        headerShown: false, // Hide header for Chat Screen
+        headerShown: true,
+        headerTitle: 'CREATE AN EVENT',
+        headerTitleAlign: 'left',
+        headerTitleStyle: { fontFamily: 'Anton', fontWeight: 'bold', fontSize: 26, color: '#8ACE00' },
+        headerStyle: { backgroundColor: '#000000' },
       }}
     />
     <Tab.Screen 
       name="Profile" 
       component={ProfileScreen} 
       options={{
-        headerShown: false, // Hide header for Profile Screen
+        headerShown: false,
       }}
     />
   </Tab.Navigator>
 );
 
-// App Component
 const App = () => {
+  // Load the Anton font using useFonts hook
+  const [fontsLoaded] = useFonts({
+    'Anton': require('./assets/fonts/Anton-Regular.ttf'),
+  });
+
+  useEffect(() => {
+    // Keep the splash screen visible while fonts are loading
+    SplashScreen.preventAutoHideAsync();
+  }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      // Hide the splash screen once fonts are loaded
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null; // Return null until fonts are loaded to prevent rendering
+  }
+
   return (
     <AuthProvider>
       <UserProvider>
-        <NavigationContainer>
+        <NavigationContainer onReady={onLayoutRootView}>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
-            {/* Splash Screen */}
-            <Stack.Screen name="Splash" component={SplashScreen} />
-            {/* Main App Tab Navigator */}
+            <Stack.Screen name="Splash" component={SplashScreenComponent} />
             <Stack.Screen name="Main" component={TabNavigator} />
-            {/* Other Screens */}
+            <Stack.Screen name="Chat" component={ChatScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="Logout" component={AuthScreen} />
