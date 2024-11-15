@@ -1,8 +1,8 @@
 import colors from '../styles/colors';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
-import * as ImagePicker from 'expo-image-picker'; // Import ImagePicker for selecting images
-import DateTimePicker from '@react-native-community/datetimepicker'; // Import DateTimePicker
+import * as ImagePicker from 'expo-image-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
@@ -46,7 +46,7 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
     };
 
     const handleSubmit = async () => {
-        const token = await AsyncStorage.getItem('userToken'); // Retrieve token from AsyncStorage or another storage method
+        const token = await AsyncStorage.getItem('userToken');
         
         const formData = new FormData();
         formData.append("name", event.name);

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, TouchableOpacity, StyleSheet, ImageBackground, Text } from 'react-native';
 import { globalStyles } from '../styles/globalStyles';
-import colors from '../styles/colors';
 import SearchBarComponent from '../components/SearchBarComponent.js'
+import { View, FlatList, TouchableOpacity, StyleSheet, ImageBackground, Text } from 'react-native';
 
 const HomeScreen = ({ navigation }) => {
   const [events, setEvents] = useState([]); // State to hold event data
@@ -70,11 +69,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
     elevation: 3,
-    width: '90%', // Reduced width
-    alignSelf: 'center', // Centers the card horizontally
+    width: '90%',
+    alignSelf: 'center',
   },
   eventImageBackground: {
-    width: '100%', // Maintain full width of the card
+    width: '100%',
     aspectRatio: 1,
     justifyContent: 'flex-end',
   },
