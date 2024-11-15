@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'; // To use the arrow icon
-import { PanGestureHandler } from 'react-native-gesture-handler'; // For swipe-to-dismiss
 import colors from '../styles/colors';
+import React, { useState } from 'react';
+import Icon from 'react-native-vector-icons/Ionicons';
+import * as ImagePicker from 'expo-image-picker'; // Import ImagePicker for selecting images
+import DateTimePicker from '@react-native-community/datetimepicker'; // Import DateTimePicker
+import { PanGestureHandler } from 'react-native-gesture-handler';
+import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
 const CreateEventScreen = ({ isVisible, onClose }) => {
     const [event, setEvent] = useState({
@@ -16,19 +18,82 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
         picture: null,
     });
 
+    const [eventPicture, setEventPicture] = useState(null);
+    const [showDatePicker, setShowDatePicker] = useState(false);
+
+    const pickImage = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.cancelled) {
+            setEventPicture(result.uri);
+        }
+    };
+
+    // Function to handle date changes from DateTimePicker
+    const handleDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || event.nativeDate;
+        setEvent({ ...event, date: currentDate.toLocaleDateString() });
+        setShowDatePicker(false);
+    };
+
     const handleInputChange = (name, value) => {
         setEvent({ ...event, [name]: value });
     };
 
-    const handleSubmit = () => {
-        console.log('Event Created:', event);
-        onClose();  // Close the modal after submitting
+    const handleSubmit = async () => {
+        const token = await AsyncStorage.getItem('userToken'); // Retrieve token from AsyncStorage or another storage method
+        
+        const formData = new FormData();
+        formData.append("name", event.name);
+        formData.append("category", event.category);
+        formData.append("description", event.description);
+        formData.append("date", event.date);
+        formData.append("address", event.address);
+        formData.append("country", event.country);
+        formData.append("city", event.city);
+        
+        if (eventPicture) {
+            formData.append("picture", {
+                uri: eventPicture,
+                name: "eventPicture.jpg",
+                type: "image/jpeg",
+            });
+        }
+    
+        try {
+            const response = await fetch("http://localhost:5000/api/events/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "Authorization": `Bearer ${token}`, // Include the JWT token
+                },
+                body: formData,
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                console.log("Event created successfully:", data.event);
+                onClose(); // Close the modal after successful creation
+            } else {
+                console.error("Error creating event:", data.message || "Something went wrong");
+            }
+        } catch (error) {
+            console.error("Error creating event:", error);
+        }
     };
+    
+    
 
-    // Handle swipe gestures to close the screen
+    // Handle swipe gestures to close the modal
     const onGestureEvent = (event) => {
         if (event.nativeEvent.translationY > 100) {
-            onClose();  // Close the screen if swiped down more than 100px
+            onClose();  // Close the modal if swiped down more than 100px
         }
     };
 
@@ -72,11 +137,21 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
 
                                 {/* Event Date */}
                                 <Text style={styles.label}>Date</Text>
-                                <TextInput
-                                    value={event.date}
-                                    onChangeText={(text) => handleInputChange('date', text)}
-                                    style={styles.input}
-                                />
+                                <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
+                                    <Text style={{ color: event.date ? colors.black : colors.grey }}>
+                                        {event.date ? event.date : 'Select Date'}
+                                    </Text>
+                                </TouchableOpacity>
+
+                                {/* Show Date Picker */}
+                                {showDatePicker && (
+                                    <DateTimePicker
+                                        value={new Date()}
+                                        mode="date"
+                                        display="default"
+                                        onChange={handleDateChange}
+                                    />
+                                )}
 
                                 {/* Event Address */}
                                 <Text style={styles.label}>Address</Text>
@@ -103,12 +178,11 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
                                 />
 
                                 {/* Event Picture */}
-                                <Text style={styles.label}>Event Picture</Text>
-                                <TextInput
-                                    value={event.picture}
-                                    onChangeText={(text) => handleInputChange('picture', text)}
-                                    style={styles.input}
-                                />
+                                <TouchableOpacity style={styles.imagePickerButton} onPress={pickImage}>
+                                    <Text style={styles.imagePickerText}>
+                                        {eventPicture ? 'Change Picture' : 'Pick Event Picture'}
+                                    </Text>
+                                </TouchableOpacity>
 
                                 {/* Submit Button */}
                                 <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
@@ -137,6 +211,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(210, 175, 29, 0.7)',
         borderRadius: 10,
         elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
     },
     closeButton: {
         position: 'absolute',
@@ -197,6 +275,17 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         fontFamily: 'Anton',
+    },
+    imagePickerButton: {
+        backgroundColor: colors.primary,
+        padding: 10,
+        borderRadius: 5,
+        marginBottom: 15,
+        alignItems: 'center',
+    },
+    imagePickerText: {
+        color: colors.white,
+        fontSize: 16,
     },
 });
 
