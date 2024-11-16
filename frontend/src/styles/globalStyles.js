@@ -4,17 +4,17 @@ import colors from './colors';
 export const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.black,  // Set background to black
+    backgroundColor: colors.black,
   },
   title: {
     fontSize: 24,
     fontFamily: 'Anton-Regular',
-    color: colors.primary,  // Green color for text
+    color: colors.primary,
   },
   button: {
     padding: 10,
     paddingHorizontal: 15,
-    backgroundColor: colors.primary,  // Green button background
+    backgroundColor: colors.primary,
     borderRadius: 5,
     width: '60%',
     alignItems: 'center',
@@ -22,7 +22,7 @@ export const globalStyles = StyleSheet.create({
     marginBottom: 10,
   },
   buttonText: {
-    color: colors.white,  // White text on the button
+    color: colors.white,
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -63,11 +63,11 @@ export const globalStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingTop: 10,
     flewGrow: 1,
-    flexDirection: 'row', // Keep the message and timestamp in a row
-    justifyContent: 'flex-end', // Align messages to the right
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
   messageBubble: {
-    backgroundColor: colors.primary, // Greenish bubble color for messages
+    backgroundColor: colors.primary,
     padding: 10,
     borderRadius: 20,
     maxWidth: '75%',  // Limit the max width of the message bubble

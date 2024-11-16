@@ -12,7 +12,7 @@ app.use(cors()); //  Cross-Origin Resource Sharing
 app.use(express.json()); // Parse JSON data
 
 // Connect to MongoDB
-mongoose.connect(config.mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(config.mongoURI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('Could not connect to MongoDB:', err));
 

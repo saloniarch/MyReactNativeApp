@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity } from 'react-native';
 import { register } from '../utils/auth';
 import { useAuth } from '../contexts/AuthContext';
+import buttonStyles from '../styles/buttonStyles';
 
 const AuthScreen = ({ navigation }) => {
   const [isRegistering, setIsRegistering] = useState(true);
@@ -35,7 +36,7 @@ const AuthScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{isRegistering ? "Register" : "Sign In"}</Text>
+      <Text style={styles.title}>{isRegistering ? "REGISTER" : "SIGN IN"}</Text>
 
       {isRegistering && (
         <TextInput
@@ -82,10 +83,10 @@ const AuthScreen = ({ navigation }) => {
       />
 
       <TouchableOpacity
-        style={styles.button}
+        style={buttonStyles.yellowButton}
         onPress={isRegistering ? handleRegister : handleLogin}
       >
-        <Text style={styles.buttonText}>
+        <Text style={buttonStyles.yellowButtonText}>
           {isRegistering ? "Register" : "Sign In"}
         </Text>
       </TouchableOpacity>
@@ -107,9 +108,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
   },
   title: {
-    fontSize: 24,
+    fontSize: 30,
     marginBottom: 20,
     color: '#8ACE00',
+    fontFamily: 'Anton',
   },
   input: {
     width: '80%',
@@ -121,20 +123,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#E1DAAE', 
     color: '#00000',
-  },
-  button: {
-    marginTop: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-    backgroundColor: '#8ACE00',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonText: {
-    color: '#000000',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
   toggleText: {
     marginTop: 20,

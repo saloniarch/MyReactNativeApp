@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { globalStyles } from '../styles/globalStyles';
 import colors from '../styles/colors';
+import buttonStyles from '../styles/buttonStyles';
 
 const EditProfileScreen = ({ navigation }) => {
   const [profileImage, setProfileImage] = useState(null);
@@ -158,12 +159,12 @@ const EditProfileScreen = ({ navigation }) => {
             <Text style={styles.characterCount}>{bio.length}/200</Text>
           </View>
 
-          <TouchableOpacity style={[globalStyles.button, styles.saveButton]} onPress={saveChanges}>
-            <Text style={styles.saveButtonText}>SAVE CHANGES</Text>
+          <TouchableOpacity style={buttonStyles.greenButton} onPress={saveChanges}>
+            <Text style={buttonStyles.greenButtonText}>SAVE CHANGES</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[globalStyles.button, styles.cancelButton]} onPress={handleCancel}>
-            <Text style={styles.cancelButtonText}>CANCEL</Text>
+          <TouchableOpacity style={buttonStyles.yellowButton} onPress={handleCancel}>
+            <Text style={buttonStyles.yellowButtonText}>CANCEL</Text>
           </TouchableOpacity>
 
         </View>
@@ -238,24 +239,6 @@ const styles = StyleSheet.create({
     top: 10,
     fontSize: 10,
   },
-  saveButton: {
-    marginTop: 30,
-    borderRadius: 5,
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colors.primary,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  cancelButton: {
-    marginTop: 15,
-    borderRadius: 5,
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colors.yellow,
-    paddingVertical: 9,
-    width: 200,
-    },
   saveButtonText: {
     fontFamily: 'Anton',
     fontSize: 20,
