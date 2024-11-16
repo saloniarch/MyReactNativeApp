@@ -26,7 +26,7 @@ const TabNavigator = ({ openEventModal }) => (
           iconName = focused ? 'home' : 'home-outline';
         } else if (route.name === 'Profile') {
           iconName = focused ? 'person' : 'person-outline';
-        } else if (route.name === 'Events') {
+        } else if (route.name === 'Create Event') {
           iconName = focused ? 'add-circle' : 'add-circle-outline';
         }
         return <Icon name={iconName} size={size} color={color} />;
@@ -62,7 +62,7 @@ const TabNavigator = ({ openEventModal }) => (
       })}
     />
     <Tab.Screen 
-      name="Events" 
+      name="Create Event" 
       component={HomeScreen} 
       listeners={{
         tabPress: (e) => {
