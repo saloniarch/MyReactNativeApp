@@ -3,8 +3,11 @@ import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import RNPickerSelect from 'react-native-picker-select';
+import { getNames } from 'country-list';
 
 const CreateEventScreen = ({ isVisible, onClose }) => {
     const [event, setEvent] = useState({
@@ -21,6 +24,8 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
     const [eventPicture, setEventPicture] = useState(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
+    const countries = getNames().map((name) => ({ label: name, value: name }));
+
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -34,7 +39,6 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
         }
     };
 
-    // Function to handle date changes from DateTimePicker
     const handleDateChange = (event, selectedDate) => {
         const currentDate = selectedDate || event.nativeDate;
         setEvent({ ...event, date: currentDate.toLocaleDateString() });
@@ -47,7 +51,7 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
 
     const handleSubmit = async () => {
         const token = await AsyncStorage.getItem('userToken');
-        
+
         const formData = new FormData();
         formData.append("name", event.name);
         formData.append("category", event.category);
@@ -56,7 +60,7 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
         formData.append("address", event.address);
         formData.append("country", event.country);
         formData.append("city", event.city);
-        
+
         if (eventPicture) {
             formData.append("picture", {
                 uri: eventPicture,
@@ -64,22 +68,22 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
                 type: "image/jpeg",
             });
         }
-    
+
         try {
-            const response = await fetch("http://localhost:5000/api/events/create", {
+            const response = await fetch("http://localhost:8081/api/events/create", {
                 method: "POST",
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    "Authorization": `Bearer ${token}`, // Include the JWT token
+                    "Authorization": `Bearer ${token}`,
                 },
                 body: formData,
             });
-    
+
             const data = await response.json();
-    
+
             if (response.ok) {
                 console.log("Event created successfully:", data.event);
-                onClose(); // Close the modal after successful creation
+                onClose();
             } else {
                 console.error("Error creating event:", data.message || "Something went wrong");
             }
@@ -87,13 +91,10 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
             console.error("Error creating event:", error);
         }
     };
-    
-    
 
-    // Handle swipe gestures to close the modal
     const onGestureEvent = (event) => {
         if (event.nativeEvent.translationY > 100) {
-            onClose();  // Close the modal if swiped down more than 100px
+            onClose();
         }
     };
 
@@ -102,7 +103,6 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
             <View style={styles.modalBackground}>
                 <PanGestureHandler onGestureEvent={onGestureEvent}>
                     <View style={styles.modalContainer}>
-                        {/* Close Button with Arrow Icon */}
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                             <Icon name="chevron-down-circle" size={30} color={colors.primary} />
                         </TouchableOpacity>
@@ -111,15 +111,17 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
                         </View>
                         <ScrollView contentContainerStyle={styles.scrollViewContent}>
                             <View style={styles.scrollViewInnerContent}>
-                                {/* Event Name */}
-                                <Text style={styles.label}>Name</Text>
+                                
+                                {/*Event Name*/}
+                                <Text style={styles.label}>Name Of The Event</Text>
                                 <TextInput
                                     value={event.name}
                                     onChangeText={(text) => handleInputChange('name', text)}
                                     style={styles.input}
+                                    autoCompleteType="off"
                                 />
 
-                                {/* Event Category */}
+                                {/*Category*/}
                                 <Text style={styles.label}>Category</Text>
                                 <TextInput
                                     value={event.category}
@@ -127,15 +129,7 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
                                     style={styles.input}
                                 />
 
-                                {/* Event Description */}
-                                <Text style={styles.label}>Description</Text>
-                                <TextInput
-                                    value={event.description}
-                                    onChangeText={(text) => handleInputChange('description', text)}
-                                    style={styles.input}
-                                />
-
-                                {/* Event Date */}
+                                {/*Date*/}
                                 <Text style={styles.label}>Date</Text>
                                 <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
                                     <Text style={{ color: event.date ? colors.black : colors.grey }}>
@@ -143,7 +137,6 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
                                     </Text>
                                 </TouchableOpacity>
 
-                                {/* Show Date Picker */}
                                 {showDatePicker && (
                                     <DateTimePicker
                                         value={new Date()}
@@ -153,38 +146,60 @@ const CreateEventScreen = ({ isVisible, onClose }) => {
                                     />
                                 )}
 
-                                {/* Event Address */}
+                                {/*Address*/}
                                 <Text style={styles.label}>Address</Text>
                                 <TextInput
                                     value={event.address}
                                     onChangeText={(text) => handleInputChange('address', text)}
                                     style={styles.input}
+                                    autoCompleteType="street-address"
                                 />
 
-                                {/* Event Country */}
-                                <Text style={styles.label}>Country</Text>
+                                {/*Country*/}
+                                <View style={styles.rowContainer}>
+                                    <View style={styles.inputContainer}>
+                                        <Text style={styles.label}>Country</Text>
+                                        <RNPickerSelect
+                                            onValueChange={(value) => handleInputChange('country', value)}
+                                            items={countries}
+                                            placeholder={{ label: "Select a country", value: null }}
+                                            style={{
+                                                inputAndroid: styles.input,
+                                                inputIOS: styles.input,
+                                            }}
+                                            value={event.country}
+                                        />
+                                    </View>
+                                    
+                                    {/*City*/}
+                                    <View style={styles.inputContainer}>
+                                        <Text style={styles.label}>City</Text>
+                                        <TextInput
+                                            value={event.city}
+                                            onChangeText={(text) => handleInputChange('city', text)}
+                                            style={styles.input}
+                                        />
+                                    </View>
+                                </View>
+
+                                {/*Description*/}
+                                <Text style={styles.label}>Description</Text>
                                 <TextInput
-                                    value={event.country}
-                                    onChangeText={(text) => handleInputChange('country', text)}
-                                    style={styles.input}
+                                    value={event.description}
+                                    onChangeText={(text) => handleInputChange('description', text)}
+                                    style={styles.descriptionInput}
+                                    multiline={true}
+                                    textAlignVertical='top'
+                                    scrollEnabled={true}
                                 />
 
-                                {/* Event City */}
-                                <Text style={styles.label}>City</Text>
-                                <TextInput
-                                    value={event.city}
-                                    onChangeText={(text) => handleInputChange('city', text)}
-                                    style={styles.input}
-                                />
-
-                                {/* Event Picture */}
+                                {/*Image upload*/}
                                 <TouchableOpacity style={styles.imagePickerButton} onPress={pickImage}>
                                     <Text style={styles.imagePickerText}>
-                                        {eventPicture ? 'Change Picture' : 'Pick Event Picture'}
+                                        {eventPicture ? 'Change Picture' : 'Upload Event Picture'}
                                     </Text>
                                 </TouchableOpacity>
 
-                                {/* Submit Button */}
                                 <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
                                     <Text style={styles.submitButtonText}>SUBMIT</Text>
                                 </TouchableOpacity>
@@ -248,6 +263,19 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         color: '#2D2D2D',
     },
+    descriptionInput: {
+        height: 150,
+        minHeight: 100,
+        maxHeight: 200,
+        borderColor: colors.yellow,
+        backgroundColor: '#C4B89A',
+        borderWidth: 1,
+        marginBottom: 15,
+        paddingLeft: 10,
+        borderRadius: 5,
+        color: '#2D2D2D',
+        textAlignVertical: 'top',
+    },
     title: {
         fontSize: 25,
         fontWeight: 'bold',
@@ -287,6 +315,16 @@ const styles = StyleSheet.create({
         color: colors.white,
         fontSize: 16,
     },
+
+    rowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 15,
+    },
+    inputContainer: {
+        width: '48%', 
+    },
 });
+
 
 export default CreateEventScreen;
