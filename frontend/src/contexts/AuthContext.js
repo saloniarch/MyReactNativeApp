@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // You can use the token to make an API call to fetch user info if needed
       // Example:
-      const response = await fetch('http://localhost:5000/api/auth/user', {
+      const response = await fetch('http://10.0.0.13:5000/api/auth/user', {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,

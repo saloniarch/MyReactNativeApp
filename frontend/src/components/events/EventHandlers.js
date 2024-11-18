@@ -25,7 +25,7 @@ const EventHandlers = ({ event, eventPicture, onClose }) => {
         }
 
         try {
-            const response = await fetch("http://localhost:5000/api/events/create", {
+            const response = await fetch("http://10.0.0.13:5000/api/events/create", {
                 method: "POST",
                 headers: {
                     "Content-Type": "multipart/form-data",

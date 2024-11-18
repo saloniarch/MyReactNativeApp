@@ -4,6 +4,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import { getNames } from 'country-list';
 import EventPicker from './EventPicker';
 import EventHandlers from './EventHandlers';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import createEventStyles from '../../styles/createEventStyles';
 import colors from '../../styles/colors';
 
