@@ -1,65 +1,52 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
+import { useUser } from '../contexts/UserContext';
+import { useFonts } from 'expo-font'; 
 import { globalStyles } from '../styles/globalStyles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import colors from '../styles/colors';
 
 const ProfileScreen = ({ navigation }) => {
-  const [userData, setUserData] = useState({});
+  const { profileData } = useUser(); // Get profile data from context
   const [fontsLoaded] = useFonts({
     'Anton': require('../../assets/fonts/Anton-Regular.ttf'),
   });
 
-  // Fetch user data from AsyncStorage
-  const fetchUserData = async () => {
-    try {
-      const storedUser = await AsyncStorage.getItem('profileData');
-      if (storedUser) {
-        setUserData(JSON.parse(storedUser));
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
-
-  // Refresh user data every time the screen is focused
-  useFocusEffect(
-    useCallback(() => {
-      fetchUserData();
-    }, [])
-  );
+  if (!fontsLoaded) {
+    return null; // Wait until fonts are loaded and profile data is available
+  }
 
   // Navigate to settings screen
   const handleSettingsNavigation = () => {
     navigation.navigate('Settings');
   };
 
-  if (!fontsLoaded) {
-    return null; // Return null until fonts are loaded to prevent rendering
-  }
-
   return (
     <View style={[globalStyles.container, styles.container]}>
       <View style={styles.profileHeader}>
-        <Image source={{ uri: userData.profileImage || 'https://via.placeholder.com/100' }} style={styles.profilePicture} />
+        <Image
+          source={{ uri: profileData?.profileImage || 'https://via.placeholder.com/100' }}
+          style={styles.profilePicture}
+        />
         <View style={styles.profileInfo}>
-          {/* Display Name Above Username */}
-          {userData.name && <Text style={styles.profileName}>{userData.name}</Text>}
-          <Text style={styles.profileUsername}>{userData.username || '@username'}</Text>
-          {/* Display Bio */}
-          {userData.bio && <Text style={styles.profileBio}>{userData.bio}</Text>}
+          {profileData?.name && <Text style={styles.profileName}>{profileData.name}</Text>}
+          <Text style={styles.profileUsername}>{profileData?.username || '@username'}</Text>
+          {profileData?.bio && <Text style={styles.profileBio}>{profileData.bio}</Text>}
         </View>
       </View>
 
-      {/* Edit Profile Button */}
-      <TouchableOpacity style={styles.editProfileButton} onPress={() => navigation.navigate('EditProfile')}>
+      <TouchableOpacity
+        style={styles.editProfileButton}
+        onPress={() => navigation.navigate('EditProfile')}
+      >
         <Text style={styles.editProfileButtonText}>EDIT PROFILE</Text>
       </TouchableOpacity>
 
-      {/* Settings Icon */}
-      <TouchableOpacity style={styles.settingsIcon} onPress={handleSettingsNavigation}>
+      <TouchableOpacity
+        style={styles.settingsIcon}
+        onPress={handleSettingsNavigation}
+      >
         <MaterialCommunityIcons name="cog-outline" size={30} color="#8ACE00" />
       </TouchableOpacity>
     </View>

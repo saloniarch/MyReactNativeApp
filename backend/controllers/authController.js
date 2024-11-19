@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { config } from '../config/config.js';
@@ -7,20 +6,22 @@ import { config } from '../config/config.js';
 export const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
 
-  if (!username || !email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-
   try {
-    // Check if the email is already registered
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: "Email already registered" });
+    // Check if user already exists
+    const userExists = await User.findOne({ $or: [{ username }, { email }] });
+    if (userExists) {
+      return res.status(400).json({ message: 'Username or Email already exists' });
+    }
 
     const newUser = new User({ username, email, password });
+
+    // Save the user to the database
     await newUser.save();
-    res.status(201).json({ message: "User registered successfully" });
+
+    res.status(201).json({ message: 'User registered successfully!' });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error('Error registering user:', error);
+    res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 };
 
@@ -28,30 +29,25 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
-  if (!username || !password) {
-    return res.status(400).json({ message: "Username and password are required" });
-  }
+    try {
+    // Find the user by username
+    const user = await User.findOne({ username });
+    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
-  try {
-    // Find the user with the username (case-insensitive)
-    const user = await User.findOne({ username: { $regex: new RegExp("^" + username + "$", "i") } });
-
-    if (!user) return res.status(400).json({ message: "Invalid username" });
-
-    // Validate password
-    const isPasswordValid = await user.comparePassword(password);
-    if (!isPasswordValid) return res.status(400).json({ message: "Invalid password" });
+    // Compare the entered password with the hashed password in the database
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
     // Create JWT token
-    const token = jwt.sign({ id: user._id }, config.jwtSecret, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user._id, username: user.username }, config.jwtSecret, { expiresIn: '1h' });
 
-    res.status(200).json({ message: "Login successful", token });
+    res.json({ token, user });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error('Error logging in:', error);
+    res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 };
-
-// Protected Content
-export const getProtectedContent = (req, res) => {
+  // Protected Content
+  export const getProtectedContent = (req, res) => {
   res.json({ message: "Protected content", user: req.user });
 };

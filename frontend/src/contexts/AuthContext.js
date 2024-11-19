@@ -1,81 +1,63 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { loginUser } from '../utils/auth';
+import { loginUser, logoutUser } from '../api/authApi';
 import * as Keychain from 'react-native-keychain';
-import jwt_decode from 'jwt-decode';
+import jwt_decode from 'jwt-decode'; 
+import { useUser } from './UserContext';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const { setUserData } = useUser(); // Access the setUser function from UserContext
 
-  // Check if the user is authenticated on app start
   useEffect(() => {
     const checkAuth = async () => {
-      const token = await Keychain.getGenericPassword(); // Fetch token from secure storage
+      const token = await Keychain.getGenericPassword(); // Fetch stored token securely
       if (token && token.password) {
-        const decodedToken = jwt_decode(token.password); // Decode the token to get its expiry time
+        try {
+          const decodedToken = jwt_decode(token.password); // Decode token
+          const isExpired = decodedToken.exp < Date.now() / 1000;
 
-        // Check if the token is expired
-        const isExpired = decodedToken.exp < Date.now() / 1000;
-        if (isExpired) {
-          await logout(); // Log the user out if the token is expired
-        } else {
-          // Token is valid, set the user data
-          const userData = await fetchUserFromToken(token.password); // Optionally fetch user data with token
-          setIsAuthenticated(true);
-          setUser(userData);
+          if (isExpired) {
+            await logout(); // Logout if the token is expired
+          } else {
+            setIsAuthenticated(true);
+            // Fetch user data using the token if necessary
+            setUserData(decodedToken.user); // Save user info into UserContext
+          }
+        } catch (error) {
+          console.error("Token decode error:", error);
         }
       }
     };
-
-    checkAuth(); // Call this on app load
-  }, []);
+    
+    checkAuth(); // Check authentication status on app load
+  }, [setUserData]);
 
   const login = async (username, password) => {
+    setLoading(true);
     try {
-      const { token, user } = await loginUser(username, password); // Call your login API function
-
-      // Store the token securely
-      await Keychain.setGenericPassword('auth_token', token); // Store the JWT token securely
-
+      const { token, user } = await loginUser(username, password); // Call your login API
+      await Keychain.setGenericPassword('auth_token', token); // Store token securely
       setIsAuthenticated(true);
-      setUser(user);
-
-      return { token, user }; // Return token and user
+      setUserData(user); // Update user data in UserContext
     } catch (error) {
-      console.error("Login error: ", error);
-      throw new Error(error.message || 'Login failed');
+      setError(error.message || 'Login failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = async () => {
     setIsAuthenticated(false);
-    setUser(null);
-    await Keychain.resetGenericPassword(); // Clear the token from secure storage
-  };
-
-  // Fetch user data from token (optional)
-  const fetchUserFromToken = async (token) => {
-    try {
-      // You can use the token to make an API call to fetch user info if needed
-      // Example:
-      const response = await fetch('http://10.0.0.13:5000/api/auth/user', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const userData = await response.json();
-      return userData; // Return user data
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      throw new Error('Unable to fetch user data');
-    }
+    setUserData(null); // Clear user data in UserContext
+    await Keychain.resetGenericPassword(); // Clear token from secure storage
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, setUser }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, loading, error }}>
       {children}
     </AuthContext.Provider>
   );

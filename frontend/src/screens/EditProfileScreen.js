@@ -2,17 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '../contexts/UserContext'; 
 import { globalStyles } from '../styles/globalStyles';
 import colors from '../styles/colors';
 import buttonStyles from '../styles/buttonStyles';
 
 const EditProfileScreen = ({ navigation }) => {
-  const [profileImage, setProfileImage] = useState(null);
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [bio, setBio] = useState('');
-  const [originalData, setOriginalData] = useState({});  // Store the original data
+  const { profileData, setProfileData } = useUser();  // Use context for global state
+  const [name, setName] = useState(profileData?.name || '');
+  const [username, setUsername] = useState(profileData?.username || '');
+  const [email, setEmail] = useState(profileData?.email || '');
+  const [bio, setBio] = useState(profileData?.bio || '');
+  const [profileImage, setProfileImage] = useState(profileData?.profileImage || null);
 
   // Load data from AsyncStorage on mount
   useEffect(() => {
@@ -20,7 +21,6 @@ const EditProfileScreen = ({ navigation }) => {
       const savedProfile = await AsyncStorage.getItem('profileData');
       if (savedProfile) {
         const parsedProfile = JSON.parse(savedProfile);
-        setOriginalData(parsedProfile);  // Store for resetting
         setName(parsedProfile.name || '');
         setUsername(parsedProfile.username || '');
         setEmail(parsedProfile.email || '');
@@ -57,13 +57,13 @@ const EditProfileScreen = ({ navigation }) => {
     }
   };
 
-  // Save profile data to AsyncStorage
+  // Save profile data to AsyncStorage and update global state
   const saveChanges = async () => {
-    const profileData = { name, username, email, bio, profileImage };
+    const updatedProfile = { name, username, email, bio, profileImage };
     try {
-      await AsyncStorage.setItem('profileData', JSON.stringify(profileData));
-      setOriginalData(profileData);  // Update original data with saved changes
-      alert('Changes saved successfully');
+      await AsyncStorage.setItem('profileData', JSON.stringify(updatedProfile));
+      setProfileData(updatedProfile);  // Update global profile data through context
+      navigation.goBack();  // Go back after saving
     } catch (error) {
       console.error('Error saving profile data:', error);
     }
@@ -71,24 +71,12 @@ const EditProfileScreen = ({ navigation }) => {
 
   // Reset fields to original data or navigate back
   const handleCancel = () => {
-    if (
-      name !== originalData.name ||
-      username !== originalData.username ||
-      email !== originalData.email ||
-      bio !== originalData.bio ||
-      profileImage !== originalData.profileImage
-    ) {
-      // Reset to last saved data
-      setName(originalData.name || '');
-      setUsername(originalData.username || '');
-      setEmail(originalData.email || '');
-      setBio(originalData.bio || '');
-      setProfileImage(originalData.profileImage || null);
-      alert('Changes discarded');
-    } else {
-      // Navigate back if no unsaved changes
-      navigation.goBack();
-    }
+    setName(profileData.name || '');
+    setUsername(profileData.username || '');
+    setEmail(profileData.email || '');
+    setBio(profileData.bio || '');
+    setProfileImage(profileData.profileImage || null);
+    navigation.goBack();
   };
 
   return (
@@ -197,9 +185,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  addPhotoText: {
-    color: colors.white,
-  },
   fieldContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -216,7 +201,7 @@ const styles = StyleSheet.create({
   },
   fieldInput: {
     flex: 2,
-    height: 40, 
+    height: 40,
     backgroundColor: 'transparent',
     borderWidth: 2,
     borderColor: colors.yellow,
@@ -227,10 +212,9 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
   },
   bioInput: {
-    height: 70, 
+    height: 70,
     textAlignVertical: 'top',
     paddingTop: 20,
-    alignItems: 'center'
   },
   characterCount: {
     position: 'absolute',
@@ -238,20 +222,6 @@ const styles = StyleSheet.create({
     right: 15,
     top: 10,
     fontSize: 10,
-  },
-  saveButtonText: {
-    fontFamily: 'Anton',
-    fontSize: 20,
-    color: colors.primary,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  cancelButtonText: {
-    fontFamily: 'Anton',
-    fontSize: 17,
-    color: colors.yellow,
-    fontWeight: 'bold',
-    textAlign: 'center',
   },
 });
 

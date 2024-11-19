@@ -3,23 +3,25 @@ import React, { createContext, useContext, useState } from 'react';
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  // Initialize with empty values or placeholder data
-  const [user, setUser] = useState({
-    name: '',
-    email: '',
-    bio: '',
-    profileImage: null, // You can set this to a placeholder URL if you prefer
-  });
+  const [profileData, setProfileData] = useState(null); // Store user data
 
-  const updateUser = (updatedUser) => {
-    setUser((prevState) => ({ ...prevState, ...updatedUser }));
+  // Set user data in context
+  const setUserData = (userData) => {
+    setUser(userData);
   };
 
   return (
-    <UserContext.Provider value={{ user, updateUser }}>
+    <UserContext.Provider value={{ profileData, setProfileData }}>
       {children}
     </UserContext.Provider>
   );
 };
 
-export const useUser = () => useContext(UserContext);
+// Custom hook to access UserContext
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error('useUser must be used within a UserProvider');
+  }
+  return context;
+};

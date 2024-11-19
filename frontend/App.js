@@ -35,20 +35,20 @@ const App = () => {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) {
-    return null; // Return null until fonts are loaded to prevent rendering
+    return null;
   }
 
   return (
-    <AuthProvider>
-      <UserProvider>
-       <GestureHandlerRootView style={{ flex: 1}}>
-        <NavigationContainer onReady={onLayoutRootView}>
-          <AppNavigator openEventModal={openEventModal} />
-        </NavigationContainer>
-        <CreateEventScreen isVisible={isModalVisible} onClose={closeEventModal} />
+    <UserProvider>
+      <AuthProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <NavigationContainer onReady={onLayoutRootView}>
+            <AppNavigator openEventModal={openEventModal} />
+          </NavigationContainer>
+          <CreateEventScreen isVisible={isModalVisible} onClose={closeEventModal} />
         </GestureHandlerRootView>
-      </UserProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </UserProvider>
   );
 };
 

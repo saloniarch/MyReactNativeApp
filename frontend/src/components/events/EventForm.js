@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-nativ
 import RNPickerSelect from 'react-native-picker-select';
 import { getNames } from 'country-list';
 import EventPicker from './EventPicker';
-import EventHandlers from './EventHandlers';
+import useEvents from '../../hooks/useEvents';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import createEventStyles from '../../styles/createEventStyles';
 import colors from '../../styles/colors';
@@ -23,6 +23,8 @@ const EventForm = ({ onClose }) => {
     const [eventPicture, setEventPicture] = useState(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
+    const { addEvent } = useEvents();
+
     const countries = getNames().map((name) => ({ label: name, value: name }));
 
     const handleInputChange = (name, value) => {
@@ -35,10 +37,22 @@ const EventForm = ({ onClose }) => {
         setShowDatePicker(false);
     };
 
+    const handleSubmit = async () => {
+        try {
+            await addEvent({
+                ...event,
+                picture: eventPicture, // Include the uploaded picture
+            });
+            console.log('Event created successfully!');
+            onClose(); // Close the modal or form after successful submission
+        } catch (error) {
+            console.error('Error submitting event:', error);
+        }
+    };
+
     return (
         <ScrollView contentContainerStyle={createEventStyles.scrollViewContent}>
             <View style={createEventStyles.scrollViewInnerContent}>
-                
                 <Text style={createEventStyles.label}>Name Of The Event</Text>
                 <TextInput
                     value={event.name}
@@ -84,7 +98,7 @@ const EventForm = ({ onClose }) => {
                         <RNPickerSelect
                             onValueChange={(value) => handleInputChange('country', value)}
                             items={countries}
-                            placeholder={{ label: "Select a country", value: null }}
+                            placeholder={{ label: 'Select a country', value: null }}
                             style={{
                                 inputAndroid: createEventStyles.input,
                                 inputIOS: createEventStyles.input,
@@ -92,7 +106,7 @@ const EventForm = ({ onClose }) => {
                             value={event.country}
                         />
                     </View>
-                    
+
                     <View style={createEventStyles.inputContainer}>
                         <Text style={createEventStyles.label}>City</Text>
                         <TextInput
@@ -109,11 +123,14 @@ const EventForm = ({ onClose }) => {
                     onChangeText={(text) => handleInputChange('description', text)}
                     style={[createEventStyles.input, createEventStyles.descriptionInput]}
                     multiline={true}
-                    textAlignVertical='top'
+                    textAlignVertical="top"
                 />
 
                 <EventPicker eventPicture={eventPicture} setEventPicture={setEventPicture} />
-                <EventHandlers event={event} eventPicture={eventPicture} onClose={onClose} />
+
+                <TouchableOpacity style={createEventStyles.submitButton} onPress={handleSubmit}>
+                    <Text style={createEventStyles.submitButtonText}>SUBMIT</Text>
+                </TouchableOpacity>
             </View>
         </ScrollView>
     );
