@@ -4,8 +4,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useUser } from '../contexts/UserContext';
 import { useFonts } from 'expo-font'; 
 import { globalStyles } from '../styles/globalStyles';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import colors from '../styles/colors';
 
 const ProfileScreen = ({ navigation }) => {
   const { profileData } = useUser(); // Get profile data from context
@@ -23,7 +21,7 @@ const ProfileScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={[globalStyles.container, styles.container]}>
+    <View style={[globalStyles.container]}>
       <View style={styles.profileHeader}>
         <Image
           source={{ uri: profileData?.profileImage || 'https://via.placeholder.com/100' }}
@@ -54,9 +52,7 @@ const ProfileScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 60,
-  },
+
   settingsIcon: {
     position: 'absolute',
     top: 55,

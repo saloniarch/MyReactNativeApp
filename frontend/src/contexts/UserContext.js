@@ -1,17 +1,39 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [profileData, setProfileData] = useState(null); // Store user data
+  const [profileData, setProfileData] = useState(null);
 
-  // Set user data in context
-  const setUserData = (userData) => {
-    setUser(userData);
+  // Load profile data from AsyncStorage on app start
+  useEffect(() => {
+    const loadProfileData = async () => {
+      try {
+        const storedProfile = await AsyncStorage.getItem('profileData');
+        if (storedProfile) {
+          setProfileData(JSON.parse(storedProfile));
+        }
+      } catch (error) {
+        console.error('Failed to load profile data:', error);
+      }
+    };
+
+    loadProfileData();
+  }, []);
+
+  // Save profile data to AsyncStorage whenever it changes
+  const saveProfileData = async (newProfileData) => {
+    try {
+      setProfileData(newProfileData);
+      await AsyncStorage.setItem('profileData', JSON.stringify(newProfileData));
+    } catch (error) {
+      console.error('Failed to save profile data:', error);
+    }
   };
 
   return (
-    <UserContext.Provider value={{ profileData, setProfileData }}>
+    <UserContext.Provider value={{ profileData, setProfileData: saveProfileData }}>
       {children}
     </UserContext.Provider>
   );
