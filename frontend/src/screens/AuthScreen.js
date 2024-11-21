@@ -1,6 +1,6 @@
 import React, { useState } from 'react'; 
 import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity } from 'react-native';
-import { registerUser, loginUser } from '../api/authApi';
+import { registerUser, loginUser, getProtectedData } from '../api/authApi';
 import { useAuth } from '../hooks/useAuth';
 import { useUser } from '../contexts/UserContext';
 import buttonStyles from '../styles/buttonStyles';
