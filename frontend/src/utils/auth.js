@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { fetchUserFromToken } from '../utils/auth'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const App = () => {

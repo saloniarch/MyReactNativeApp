@@ -15,7 +15,9 @@ const authMiddleware = (req, res, next) => {
     }
 
     try {
+        console.log("Token received in header:", token); // Log received token
         const decoded = jwt.verify(token, config.jwtSecret);
+        console.log("Decoded payload:", decoded); // Log decoded token data
         req.user = decoded; // Attach user data to the request object
         next();
     } catch (error) {

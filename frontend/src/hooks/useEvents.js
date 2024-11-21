@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createEvent, fetchEvents } from '../api/eventsApi';
 
 const useEvents = () => {
@@ -19,7 +20,7 @@ const useEvents = () => {
         }
     };
 
-    const addEvent = async (eventData, token = localStorage.getItem('token')) => {
+    const addEvent = async (eventData) => {
         setAddEventLoading(true);
         const formData = new FormData();
 
@@ -36,6 +37,8 @@ const useEvents = () => {
         });
 
         try {
+            const token = await AsyncStorage.getItem('userToken');
+
             const response = await fetch('http://10.0.0.13:5000/api/events/create', {
                 method: 'POST',
                 headers: {

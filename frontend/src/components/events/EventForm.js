@@ -28,12 +28,13 @@ const EventForm = ({ onClose }) => {
     const countries = getNames().map((name) => ({ label: name, value: name }));
 
     const handleInputChange = (name, value) => {
+        console.log(`Input Change - ${name}: ${value}`);
         setEvent({ ...event, [name]: value });
     };
 
     const handleDateChange = (event, selectedDate) => {
         const currentDate = selectedDate || event.nativeDate;
-        setEvent({ ...event, date: currentDate.toLocaleDateString() });
+        setEvent({ ...event, date: currentDate.toISOString().split('T')[0] });
         setShowDatePicker(false);
     };
 
@@ -80,7 +81,7 @@ const EventForm = ({ onClose }) => {
                         value={new Date()}
                         mode="date"
                         display="default"
-                        onChange={(event, date) => handleDateChange(event, date)}
+                        onChange={handleDateChange}
                     />
                 )}
 
@@ -102,6 +103,7 @@ const EventForm = ({ onClose }) => {
                             style={{
                                 inputAndroid: createEventStyles.input,
                                 inputIOS: createEventStyles.input,
+                                placeholder: { color: 'gray' },
                             }}
                             value={event.country}
                         />

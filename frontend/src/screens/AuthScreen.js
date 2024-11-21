@@ -1,6 +1,6 @@
 import React, { useState } from 'react'; 
 import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity } from 'react-native';
-import { registerUser, loginUser } from '../api/authApi';
+import { registerUser, loginUser, getProtectedData } from '../api/authApi';
 import { useAuth } from '../hooks/useAuth';
 import { useUser } from '../contexts/UserContext';
 import buttonStyles from '../styles/buttonStyles';
@@ -53,6 +53,9 @@ const AuthScreen = ({ navigation }) => {
       setUser(userData.user); // Set user data in AuthContext
       setUserData(userData.user); // Update user data in UserContext
       navigation.replace("Main");
+
+      const getProtectedData = await getProtectedData();
+      console.log('Protected Data:', getProtectedData);
     } catch (error) {
       Alert.alert("Login failed", error.message || "An error occurred during login.");
     }

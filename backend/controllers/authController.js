@@ -13,7 +13,7 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: 'Username or Email already exists' });
     }
 
-    const newUser = new User({ username, email, password });
+    const newUser = new User({ username: username.toLowerCase(), email, password });
 
     // Save the user to the database
     await newUser.save();
@@ -28,18 +28,30 @@ export const registerUser = async (req, res) => {
 // Login User
 export const loginUser = async (req, res) => {
   const { username, password } = req.body;
+  console.log('Entered password:', password);
 
     try {
     // Find the user by username
-    const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+    const user = await User.findOne({ username: username.toLowerCase() });
+    if (!user) {
+      console.log('No user found with username:', username);
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
     // Compare the entered password with the hashed password in the database
     const isMatch = await user.comparePassword(password);
+    console.log('Password match result:', isMatch);
+    console.log('Stored hashed password:', user.password);
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+    console.log('Stored hashed password:', user.password);
 
     // Create JWT token
-    const token = jwt.sign({ id: user._id, username: user.username }, config.jwtSecret, { expiresIn: '1h' });
+    const token = jwt.sign(
+      { id: user._id, username: user.username }, 
+      config.jwtSecret, 
+      { expiresIn: '1h' });
+    
+    console.log("Generated Token:", token); // Log token here
 
     res.json({ token, user });
   } catch (error) {
