@@ -1,6 +1,6 @@
 import React, { useState } from 'react'; 
 import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity } from 'react-native';
-import { registerUser, loginUser, getProtectedData } from '../api/authApi';
+import { registerUser, loginUser } from '../api/authApi';
 import { useAuth } from '../hooks/useAuth';
 import { useUser } from '../contexts/UserContext';
 import buttonStyles from '../styles/buttonStyles';
@@ -22,8 +22,8 @@ const AuthScreen = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   // Access auth functions and user state from context
-  const { login, setUser, error, loading } = useAuth();
-  const { setUserData } = useUser();
+  const { login, error, loading } = useAuth();
+  const { setProfileData } = useUser();
 
   const handleRegister = async () => {
     const passwordError = validatePassword(password);
@@ -49,13 +49,12 @@ const AuthScreen = ({ navigation }) => {
     }
 
     try {
-      const userData = await loginUser(username, password);
-      setUser(userData.user); // Set user data in AuthContext
-      setUserData(userData.user); // Update user data in UserContext
+      const { user } = await loginUser(username, password);
+      setProfileData(user); // Save profile data in UserContext
       navigation.replace("Main");
 
-      const getProtectedData = await getProtectedData();
-      console.log('Protected Data:', getProtectedData);
+      const protectedData = await getProtectedData();
+      console.log('Protected Data:', protectedData);
     } catch (error) {
       Alert.alert("Login failed", error.message || "An error occurred during login.");
     }
@@ -65,16 +64,19 @@ const AuthScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>{isRegistering ? "REGISTER" : "SIGN IN"}</Text>
 
+      {/* Username input for both login and registration */}
+      <TextInput
+        style={styles.input}
+        placeholder="Username"
+        value={username}
+        onChangeText={setUsername}
+        autoCapitalize="none"
+        placeholderTextColor="#7F7F7F"
+      />
+
       {isRegistering && (
         <>
-          <TextInput
-            style={styles.input}
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-            placeholderTextColor="#7F7F7F"
-          />
+          {/* Email input only for registration */}
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -87,17 +89,7 @@ const AuthScreen = ({ navigation }) => {
         </>
       )}
 
-      {!isRegistering && (
-        <TextInput
-          style={styles.input}
-          placeholder="Username"
-          value={username}
-          onChangeText={setUsername}
-          autoCapitalize="none"
-          placeholderTextColor="#7F7F7F"
-        />
-      )}
-
+      {/* Password input for both login and registration */}
       <TextInput
         style={styles.input}
         placeholder="Password"

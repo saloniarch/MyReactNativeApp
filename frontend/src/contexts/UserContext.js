@@ -6,7 +6,6 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [profileData, setProfileData] = useState(null);
 
-  // Load profile data from AsyncStorage on app start
   useEffect(() => {
     const loadProfileData = async () => {
       try {
@@ -22,7 +21,6 @@ export const UserProvider = ({ children }) => {
     loadProfileData();
   }, []);
 
-  // Save profile data to AsyncStorage whenever it changes
   const saveProfileData = async (newProfileData) => {
     try {
       setProfileData(newProfileData);

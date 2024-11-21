@@ -1,82 +1,117 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import jwt_decode from 'jwt-decode';
-
-const API_URL = __DEV__ ? "http://10.0.0.13:5000/api/auth" : "https://yourapi.com/api/auth";
+import jwtDecode from 'jwt-decode';
+import { getToken, saveToken, clearToken } from '../utils/tokenUtils';
+import { API_URL } from '@env';
 
 const api = axios.create({
   baseURL: API_URL,
   timeout: 10000,
 });
 
-export const getProtectedData = async () => {
-  const token = await AsyncStorage.getItem('auth_token'); // Retrieve token
-  if (!token) throw new Error("No token found");
+// Safe token decoding function
+const decodeToken = (token) => {
+  try {
+    if (!token) {
+      throw new Error("No token provided");
+    }
 
-  console.log("Sending token:", token); // Log token before sending
+    // Decode the JWT token
+    const decodedToken = jwtDecode(token);
 
-  const response = await api.get('/protected', { 
-    headers: {
-      Authorization: `Bearer ${token}`,  // Attach token to Authorization header
-    },
-  });
+    // Check if the token has an expiration date
+    if (!decodedToken || !decodedToken.exp) {
+      throw new Error("Invalid token format");
+    }
 
-  return response.data;
+    return decodedToken;
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    throw error; // Re-throw to handle it in the calling function
+  }
 };
 
+// Fetch protected data
+export const getProtectedData = async () => {
+  try {
+    const token = await getToken();
+    if (!token) throw new Error("No token found");
+
+    const response = await api.get('/protected', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching protected data:", error.message);
+    throw error;
+  }
+};
+
+// Register a new user
 export const registerUser = async (userData) => {
   const response = await api.post('/register', userData);
   return response.data;
 };
 
+// Login user and save token
 export const loginUser = async (username, password) => {
-  const response = await api.post('/login', { username, password });
-  console.log(username, password);
-  const { token, user } = response.data;
-
-  console.log("Received Token:", token); // Log received token from API
-
   try {
-    const decodedToken = jwt_decode(token);
-    console.log("Decoded Token:", decodedToken); // Log decoded payload to ensure validity
+    const response = await api.post('/login', { username, password });
+    const { token, user } = response.data;
 
-    const currentTime = Date.now() / 1000;
-    if (decodedToken.exp < currentTime) throw new Error("Token has expired");
+    const decodedToken = decodeToken(token);
+    
+    if (decodedToken.exp < Math.floor(Date.now() / 1000)) {
+      throw new Error("Token has expired");
+    }
 
-    await AsyncStorage.setItem('auth_token', token);
-    await AsyncStorage.setItem('user_data', JSON.stringify(user));
-
-    return { token, user };
+    await saveToken(token); // Save token
+    return { token, user }; // Return token and user data
   } catch (error) {
-    console.error("Error during JWT decoding:", error.message);
-    throw new Error("Token decoding failed or is expired.");
+    console.error("Error logging in:", error.message);
+    throw error;
   }
 };
 
+// Fetch user info using token
 export const fetchUserFromToken = async () => {
-  const token = await AsyncStorage.getItem('auth_token');
-  if (!token) throw new Error('No auth token found');
+  try {
+    const token = await getToken();
+    if (!token) throw new Error("No auth token found");
 
-  const decodedToken = jwtDecode(token);
-  if (decodedToken.exp < Date.now() / 1000) throw new Error('Token expired');
+    const decodedToken = decodeToken(token);
 
-  const response = await api.get('/user', {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+    if (decodedToken.exp < Date.now() / 1000) throw new Error("Token expired");
 
-  return response.data;
+    const response = await api.get('/user', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user from token:", error.message);
+    throw error;
+  }
 };
 
+// Logout user and clear storage
 export const logoutUser = async () => {
-  await AsyncStorage.removeItem('auth_token');
-  await AsyncStorage.removeItem('user_data');
+  await clearToken(); // Clear token securely
 };
 
+// Refresh token
 export const refreshToken = async () => {
-  const token = await AsyncStorage.getItem('auth_token');
-  const response = await api.post('/refresh-token', { token });
+  try {
+    const token = await getToken();
+    if (!token) throw new Error("No token to refresh");
 
-  const { newToken } = response.data;
-  await AsyncStorage.setItem('auth_token', newToken);
-  return newToken;
+    const response = await api.post('/refresh-token', { token });
+    const { newToken } = response.data;
+
+    await saveToken(newToken); // Save new token securely
+    return newToken;
+  } catch (error) {
+    console.error("Error refreshing token:", error.message);
+    throw error;
+  }
 };
