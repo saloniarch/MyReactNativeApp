@@ -1,8 +1,6 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity } from 'react-native';
-import { registerUser, loginUser, getProtectedData } from '../api/authApi';
-import { useAuth } from '../hooks/useAuth';
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthContext';
 import buttonStyles from '../styles/buttonStyles';
 
 // Password validation
@@ -15,31 +13,12 @@ const validatePassword = (password) => {
 };
 
 const AuthScreen = ({ navigation }) => {
-  const [isRegistering, setIsRegistering] = useState(true);
+  const [isRegistering, setIsRegistering] = useState(false);
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  // Access auth functions and user state from context
-  const { login, error, loading } = useAuth();
-  const { setProfileData } = useUser();
-
-  const handleRegister = async () => {
-    const passwordError = validatePassword(password);
-    if (passwordError) {
-      Alert.alert("Registration Error", passwordError);
-      return;
-    }
-
-    try {
-      await registerUser({ username, email, password });
-      Alert.alert("Success", "Registration successful!");
-      navigation.replace("Main"); 
-    } catch (error) {
-      Alert.alert("Registration Error", error.message);
-    }
-  };
+  const { login, loading, error } = useAuth();
 
   const handleLogin = async () => {
     const passwordError = validatePassword(password);
@@ -49,14 +28,10 @@ const AuthScreen = ({ navigation }) => {
     }
 
     try {
-      const { user } = await loginUser(username, password);
-      setProfileData(user); // Save profile data in UserContext
+      await login(username, password);
       navigation.replace("Main");
-
-      const protectedData = await getProtectedData();
-      console.log('Protected Data:', protectedData);
-    } catch (error) {
-      Alert.alert("Login failed", error.message || "An error occurred during login.");
+    } catch (err) {
+      Alert.alert("Login failed", err.message || "An error occurred during login.");
     }
   };
 
@@ -64,7 +39,7 @@ const AuthScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>{isRegistering ? "REGISTER" : "SIGN IN"}</Text>
 
-      {/* Username input for both login and registration */}
+      {/* Username input */}
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -74,47 +49,30 @@ const AuthScreen = ({ navigation }) => {
         placeholderTextColor="#7F7F7F"
       />
 
-      {isRegistering && (
-        <>
-          {/* Email input only for registration */}
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            placeholderTextColor="#7F7F7F"
-          />
-        </>
-      )}
-
-      {/* Password input for both login and registration */}
+      {/* Password input */}
       <TextInput
         style={styles.input}
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry={!passwordVisible} // Toggle password visibility
+        secureTextEntry={!passwordVisible}
         autoCapitalize="none"
         placeholderTextColor="#7F7F7F"
       />
 
-      {/* Password visibility toggle button */}
       <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
         <Text style={{ color: '#D2AF1D', marginTop: 10 }}>
           {passwordVisible ? "Hide" : "Show"} Password
         </Text>
       </TouchableOpacity>
 
-      {/* Submit Button */}
       <TouchableOpacity
-        style={[buttonStyles.yellowButton, { opacity: loading ? 0.5 : 1 }]} // Disable button when loading
-        onPress={isRegistering ? handleRegister : handleLogin}
-        disabled={loading} // Disable button during API request
+        style={[buttonStyles.yellowButton, { opacity: loading ? 0.5 : 1 }]}
+        onPress={handleLogin}
+        disabled={loading}
       >
         <Text style={buttonStyles.yellowButtonText}>
-          {loading ? "Processing..." : isRegistering ? "Register" : "Sign In"}
+          {loading ? "Processing..." : "Sign In"}
         </Text>
       </TouchableOpacity>
 
@@ -124,7 +82,6 @@ const AuthScreen = ({ navigation }) => {
         </Text>
       </TouchableOpacity>
 
-      {/* Displaying error message */}
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );

@@ -7,10 +7,16 @@ const createEventStyles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
     },
     modalContainer: {
         width: '90%',
-        height: '78%',
+        maxWidth: 500,
+        height: '90%',
         padding: 0, 
         backgroundColor: 'rgba(210, 175, 29, 0.7)',
         borderRadius: 10,
@@ -19,6 +25,7 @@ const createEventStyles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 6,
+        overflow: 'hidden',
     },
     closeButton: {
         position: 'absolute',
@@ -36,6 +43,7 @@ const createEventStyles = StyleSheet.create({
         alignItems: 'center',
     },
     scrollViewContent: {
+        flexGrow: 1,
         paddingBottom: 20,
     },
     scrollViewInnerContent: {
