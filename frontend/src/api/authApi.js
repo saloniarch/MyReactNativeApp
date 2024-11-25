@@ -115,3 +115,5 @@ export const refreshToken = async () => {
     throw error;
   }
 };
+
+export default api;

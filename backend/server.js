@@ -3,14 +3,15 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import { config } from './config/config.js';
 import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
 
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: "http://10.0.0.13:5000/api/auth",
-})); //  Cross-Origin Resource Sharing
+app.use(cors({methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+  credentials: true, // For cookies if needed
+  })); //  Cross-Origin Resource Sharing
 app.use(express.json()); // Parse JSON data
 
 // Connect to MongoDB
@@ -20,6 +21,7 @@ mongoose.connect(config.mongoURI)
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/events', eventRoutes);
 
 // Start the server

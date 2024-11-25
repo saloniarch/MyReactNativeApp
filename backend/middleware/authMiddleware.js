@@ -1,29 +1,21 @@
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
 
-const authMiddleware = (req, res, next) => {
-    const authHeader = req.header("Authorization");
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) return res.status(401).json({ error: 'Token missing' });
 
-    if (!authHeader) {
-        return res.status(401).json({ message: "Access denied. No authorization header provided." });
-    }
+  jwt.verify(token, config.jwtSecret, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Invalid token' });
 
-    const token = authHeader.split(" ")[1];
-
-    if (!token) {
-        return res.status(401).json({ message: "Access denied. Bearer token missing." });
-    }
-
-    try {
-        console.log("Token received in header:", token); // Log received token
-        const decoded = jwt.verify(token, config.jwtSecret);
-        console.log("Decoded payload:", decoded); // Log decoded token data
-        req.user = decoded; // Attach user data to the request object
-        next();
-    } catch (error) {
-        console.error("JWT verification failed:", error.message);
-        return res.status(401).json({ message: "Invalid token" });
-    }
+    // Debugging: Log the decoded user data
+    console.log('Decoded JWT User:', user);  // <-- Add this line for debugging
+    
+    req.user = user; // Attach user information to the request object
+    next();
+  });
 };
 
-export default authMiddleware;
+export default authenticateToken;
