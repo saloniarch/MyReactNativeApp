@@ -42,10 +42,10 @@ const EventForm = ({ onClose }) => {
         try {
             await addEvent({
                 ...event,
-                picture: eventPicture, // Include the uploaded picture
+                picture: eventPicture,
             });
             console.log('Event created successfully!');
-            onClose(); // Close the modal or form after successful submission
+            onClose(); 
         } catch (error) {
             console.error('Error submitting event:', error);
         }

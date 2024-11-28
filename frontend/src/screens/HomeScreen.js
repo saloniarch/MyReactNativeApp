@@ -10,7 +10,7 @@ const HomeScreen = ({ navigation }) => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await fetch("http://10.0.0.13:5000/api/events"); // Replace IP with your laptop's IP
+                const response = await fetch("http://192.168.0.36:8081/api/events"); // Replace IP with your laptop's IP
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -34,7 +34,7 @@ const HomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('EventDetails', { event: item })}
         >
             <ImageBackground
-                source={{ uri: `http://10.0.0.13:5000/${item.picture}` }} // Use proper path
+                source={{ uri: `http://192.168.0.36:8081/${item.picture}` }} // Use proper path
                 style={styles.eventImageBackground}
                 imageStyle={{ borderRadius: 10 }}
             >

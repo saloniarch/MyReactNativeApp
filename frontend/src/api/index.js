@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: 'http://10.0.0.13:5000', 
+    baseURL: 'http://192.168.0.36:8081', 
 });
 
 // JWT token to headers

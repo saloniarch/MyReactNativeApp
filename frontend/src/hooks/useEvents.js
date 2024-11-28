@@ -8,6 +8,7 @@ const useEvents = () => {
     const [addEventLoading, setAddEventLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    // Load all events on initial mount
     const loadEvents = async () => {
         setLoading(true);
         try {
@@ -20,10 +21,12 @@ const useEvents = () => {
         }
     };
 
+    // Add a new event
     const addEvent = async (eventData) => {
         setAddEventLoading(true);
         const formData = new FormData();
 
+        // Prepare the form data for the request
         Object.keys(eventData).forEach((key) => {
             if (key === 'picture' && eventData[key]) {
                 formData.append(key, {
@@ -39,26 +42,13 @@ const useEvents = () => {
         try {
             const token = await AsyncStorage.getItem('userToken');
 
-            const response = await fetch('http://10.0.0.13:5000/api/events/create', {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                body: formData,
-            });
+            // Use the `createEvent` API method
+            const data = await createEvent(formData, token);
 
-            if (!response.ok) {
-                const message = response.status === 401
-                    ? 'Unauthorized. Please log in again.'
-                    : response.status === 500
-                    ? 'Server error. Please try again later.'
-                    : 'Failed to create event.';
-                throw new Error(message);
-            }
-
-            const data = await response.json();
+            // Add the new event to the events state
             setEvents((prev) => [...prev, data.event]);
         } catch (error) {
+            console.log('Error adding event:', error.message);
             setError(error.message);
             throw error;
         } finally {
@@ -66,6 +56,7 @@ const useEvents = () => {
         }
     };
 
+    // Run loadEvents on component mount
     useEffect(() => {
         loadEvents();
     }, []);

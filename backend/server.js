@@ -9,7 +9,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: "http://10.0.0.13:5000/api/auth",
+  origin: "http://192.168.0.36:8081",
 })); //  Cross-Origin Resource Sharing
 app.use(express.json()); // Parse JSON data
 
