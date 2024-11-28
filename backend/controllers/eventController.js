@@ -1,12 +1,14 @@
 import Event from '../models/Events.js';
 
 export const createEvent = async (req, res) => {
+    console.log('Julebord');
     try {
+        const eventData = JSON.parse(req.body.eventData); // Parse JSON object from string
         const { name, category, description, date, address, country, city } = req.body;
 
-        if (!name || !category || !description || !date || !address || !country || !city) {
+        /*if (!name || !category || !description || !date || !address || !country || !city) {
             return res.status(400).json({ message: 'All fields are required' });
-        }
+        }*/
 
         const newEvent = new Event({
             name,

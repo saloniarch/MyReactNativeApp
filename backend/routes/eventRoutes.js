@@ -29,8 +29,11 @@ const upload = multer({
 });
 
 // Routes
-router.post('/create', authMiddleware, upload.single('picture'), createEvent); // Use controller
-router.get('/', fetchEvents); // Use controller
+router.post('/create', authMiddleware, upload.single('picture'), (req, res, next) => {
+    console.log('POST /create route accessed');
+    next();
+}, createEvent);
+router.get('/fetchEvent', fetchEvents); 
 
 // Serve static files
 router.use('/uploads', express.static(path.join(__dirname, '../uploads')));

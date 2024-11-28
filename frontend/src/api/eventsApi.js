@@ -1,14 +1,17 @@
 import API from './index';
 
-export const createEvent = async (eventData) => {
-    const formData = new FormData();
-    Object.keys(eventData).forEach((key) => formData.append(key, eventData[key]));
-
-    const response = await API.post('/events/create', formData);
+// Function to create an event
+export const createEvent = async (formData, token) => {
+    const response = await API.post('/events/create', formData, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
     return response.data;
 };
 
+// Function to fetch all events
 export const fetchEvents = async () => {
-    const response = await API.get('/events');
+    const response = await API.get('/events/fetchEvent');
     return response.data.events;
 };
