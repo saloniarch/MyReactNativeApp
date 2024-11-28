@@ -12,6 +12,6 @@ export const createEvent = async (formData, token) => {
 
 // Function to fetch all events
 export const fetchEvents = async () => {
-    const response = await API.get('/events');
+    const response = await API.get('/events/fetchEvent');
     return response.data.events;
 };

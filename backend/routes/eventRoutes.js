@@ -33,7 +33,7 @@ router.post('/create', authMiddleware, upload.single('picture'), (req, res, next
     console.log('POST /create route accessed');
     next();
 }, createEvent);
-router.get('/', fetchEvents); 
+router.get('/fetchEvent', fetchEvents); 
 
 // Serve static files
 router.use('/uploads', express.static(path.join(__dirname, '../uploads')));
